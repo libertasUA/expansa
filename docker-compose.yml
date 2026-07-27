@@ -1,0 +1,67 @@
+name: expansa
+
+services:
+  postgres:
+    # Pinned to a major version on purpose. `docker compose pull` picks up patch
+    # releases; a new major never arrives silently and breaks the world.
+    image: postgres:18-alpine
+    container_name: expansa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-expansa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-expansa}
+      POSTGRES_DB: ${POSTGRES_DB:-expansa}
+      # Deterministic collation, so ORDER BY behaves identically on every machine.
+      POSTGRES_INITDB_ARGS: "--locale=C --encoding=UTF8"
+    ports:
+      # Ports 5432-5434 belong to system-installed PostgreSQL clusters (15, 16, 17)
+      # on the dev machine, so this one is published on 5435.
+      # Published only so host tools (psql, a GUI client, migration CLI) can connect;
+      # the server container reaches this service as postgres:5432 instead.
+      - "${POSTGRES_PORT:-5435}:5432"
+    volumes:
+      # PostgreSQL 18+ images expect a single mount at /var/lib/postgresql and place
+      # the cluster in a version-specific subdirectory, so that `pg_upgrade --link`
+      # does not have to cross a mount boundary. Mounting /var/lib/postgresql/data
+      # directly, as was correct for 17 and earlier, makes the image refuse to start.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-expansa} -d ${POSTGRES_DB:-expansa}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: expansa-server
+    working_dir: /workspace
+    # PID 1 is a shell here, which neither forwards signals nor reaps orphans.
+    # tini does both, so watch-mode restarts do not leave processes holding the port.
+    init: true
+    env_file: .env
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    volumes:
+      # The whole repository is bind-mounted, including node_modules. Host and
+      # container are both linux/glibc/amd64, so the same install works in both —
+      # this is what keeps IDE tooling on the host functional.
+      - .:/workspace
+      # Named volume for the pnpm content-addressable store, so installs stay fast
+      # across container rebuilds.
+      - pnpm-store:/home/node/.local/share/pnpm/store
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Dependencies are installed on start so that a fresh clone needs nothing but
+    # `docker compose up`. The install is a no-op when node_modules is current.
+    command: sh -c "pnpm install && pnpm --filter @expansa/server dev"
+
+volumes:
+  postgres-data:
+  pnpm-store:

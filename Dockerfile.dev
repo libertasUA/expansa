@@ -1,0 +1,27 @@
+# Development environment for the server workspace.
+#
+# Debian-based on purpose, not Alpine: the host is Ubuntu (glibc) and the project
+# directory is bind-mounted, so node_modules is shared between container and host.
+# An Alpine image would build native modules against musl and break host tooling
+# (IDE, TypeScript server, any command run outside the container).
+FROM node:24-bookworm-slim
+
+# Toolchain for dependencies that compile native addons.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        python3 \
+        make \
+        g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# pnpm is delivered through corepack, so its version is pinned by
+# package.json#packageManager rather than by this image.
+RUN corepack enable
+
+WORKDIR /workspace
+
+# The node user in this image is uid/gid 1000, matching the host developer account,
+# so files created inside the container are not root-owned on the host.
+USER node
