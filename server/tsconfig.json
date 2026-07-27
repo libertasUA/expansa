@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // CommonJS, not ESM. The NestJS CLI, its watch mode, and decorator metadata
+    // emission are all built around CJS; ESM support exists but is fragile enough
+    // that it is not worth spending debugging budget on. Code shared with the
+    // mobile client lives in packages/shared and stays ESM-compatible.
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
