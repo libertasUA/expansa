@@ -1,9 +1,12 @@
 # Expansa — MMO Strategy Game
 
 ## Overview
-Mobile MMO strategy game (Travian/Third World-like) with a sci-fi setting.
-Backend: Node.js + TypeScript. Mobile client: React Native (Expo).
-No browser client is in scope at launch.
+MMO strategy game (Travian/Third World-like) with a sci-fi setting.
+Backend: Node.js + TypeScript.
+
+**One client ships at launch; which one is not decided.** Mobile (React Native) and web
+are both candidates, and a Steam build would be the web client in a desktop shell rather
+than a third codebase. The boundaries below are built for several clients — see Clients.
 
 ## Architecture: Three-Contour Approach
 
@@ -46,24 +49,52 @@ Decided — see the linked ADR for reasoning, do not re-litigate without one:
 - Server framework: NestJS 11 on the Fastify adapter — ADR 0001
 - Database: PostgreSQL 18
 - Local development runs in Docker Compose: PostgreSQL plus a Node container that
-  hosts the server and pnpm. Expo stays on the host — it needs USB and emulators.
-  Images are pinned to a major version, never `latest`.
+  hosts the server and pnpm. The client toolchain stays on the host — a mobile one
+  needs USB and emulators. Images are pinned to a major version, never `latest`.
   - The containerised database is published on host port **5435**; 5432-5434 belong
     to system-installed PostgreSQL clusters on the dev machine.
   - From inside the compose network the database is `postgres:5432`.
-- Mobile: React Native (Expo). Mobile-only at launch, no web client in scope.
 - Time model: lazy evaluation for resources (computed on read, never ticked) plus
   deferred jobs for discrete events (construction completion, troop arrival,
   research). The intended direction, but the ADR is still in draft and unreviewed —
   treat the details as unsettled.
 
 Still open — do not assume an answer, ask before writing code that depends on it:
+- Which client is built first — mobile or web
 - Validation / schema approach (class-validator vs Zod in a shared package)
 - Transaction strategy under NestJS DI
 - Database access layer and migration tooling
 - Job scheduler and queue
 - Event ordering model for simultaneous events on one village
 - Client-server contract details and the server-push channel
+
+## Clients
+
+One client is written; the architecture assumes there will be more. Almost nothing on the
+server depends on which comes first — only three adapters do: push transport, payment
+provider, and session storage. So the choice stays open, and these rules keep it open:
+
+1. **The server never knows which client is talking to it.** No branching on platform. A
+   client that needs different behaviour declares its own capabilities; the server does
+   not infer them from a User-Agent.
+2. **A client directory holds rendering and platform APIs, nothing else.** Transport,
+   session, local store, cached state, and view models are not rendering. Inside the first
+   client keep them split as `src/core/` and `src/ui/`, so extracting a shared client
+   package later is a file move rather than a rewrite.
+3. **The contract is versioned (`/v1`) and changes additively.** Fields may be added;
+   removing one or changing its meaning requires a new version. This is not optional
+   politeness: a mobile client updates over weeks, so the server must serve several
+   contract versions at once.
+
+A shared client package is deliberately **not** created up front — a family of zero cannot
+be designed for. It gets extracted when the second client appears.
+
+Two consequences land in the schema before any client exists, and are expensive to retrofit:
+
+- **Accounts, not users.** `accounts` plus `identities(provider, external_id)`. One player
+  may arrive through Apple, Google, Steam, or email and must be one account.
+- **Validation runs on both sides.** Whatever is chosen, the schema must execute in the
+  client too — which rules out decorator-based `class-validator` DTOs as the only source.
 
 ## Local Development
 
