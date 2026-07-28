@@ -56,50 +56,96 @@ requires other people?
 
 ## What a base is
 
-**A landed ark on a planet.** The ship that carried its owner out of the collapse, set down
-and never flying again.
+**A large ship — the ark that carried its owner out of the collapse.** It holds a
+survivor's entire remaining civilisation, and its hull is technology nobody alive can
+reproduce or easily breach, which is why it is hard to kill: the reason lives in the
+fiction rather than in the rulebook.
 
-The choice answers four questions at once, which is why it wins over a station, a bare
-planet, or an asteroid base:
+Everyone having an ark is answered by the same collapse. They were built in thousands
+during the evacuation and most were lost; they are common among survivors precisely
+because only their passengers survived.
 
-- **It cannot move.** Not by rule but by nature — it landed. Distance stays meaningful as
-  path length through the sector graph, so blockade and siege mean something.
-- **Slots are finite.** A sector is a star system with a fixed number of planetary sites,
-  around fifty. The "fifty players per sector" figure becomes a property of the world
-  rather than a tuning value, and land becomes something to fight over.
-- **Its hull explains its toughness.** It is technology of the fallen civilisation, which
-  the survivors can neither reproduce nor easily breach. The reason lives in the fiction
-  instead of in the rulebook.
-- **It does not collide with asteroids**, which stay what they are: a separate, finite,
-  contested resource.
+### The economy is outside the ark
 
-Everyone having "the last ark" is answered by the same collapse: arks were built in
-thousands during the evacuation and most were lost. They are common among survivors
-precisely because only their passengers survived.
+This is the load-bearing idea, and everything else follows from it.
 
-**One ark per planet.** Other players may hold stations in orbit above it, which is what
-makes a blockade physical rather than abstract — the enemy is literally overhead.
+The ark itself produces almost nothing. It absorbs **solar energy** in small amounts —
+slowly, forever, and nobody can take that away. Everything else has to be fetched:
 
-### Ark and stations
+```
+energy       from nothing, slow, cannot be taken
+   ↓ synthesis — always available, always a terrible rate
+fuel         buys reach
+   ↓ dispatching robotic complexes
+material     extracted outside — fast, and exposed
+```
 
-> **The ark is your economy. Stations are your reach.**
+> **Synthesis is always possible and always bad. Extraction is good, but it requires
+> reaching out, and it can be taken from you.**
 
-The ark produces and stores, and you always have one. Stations mine asteroids, hold gates,
-carry reconnaissance and stage fleets — and they can be destroyed and captured freely.
+The whole game lives in the gap between those two rates. Stay home and you survive; reach
+out and you grow, at risk.
 
-This is what a war actually takes from you: everything built outward, while the thing that
-keeps you playing is far harder to remove.
+Fuel is the expensive part, synthesised by a costly module, and it is what buys distance:
+sending robotic complexes to nearby planets, moons and asteroids, and hauling what they
+extract back home. On the larger objects a complex can become a **permanent base** rather
+than a temporary operation.
+
+**Extracted material comes home in convoys, not by wire.** That is a deliberate choice
+over continuous delivery: cargo in transit is a target, so the supply line is part of the
+war rather than an abstraction behind it.
+
+### No state is terminal
+
+Complexes cost material, material is extracted, extraction needs a complex — a circle that
+would leave a player who lost everything permanently dead.
+
+So the synthesiser produces **basic material as well as fuel**, at a rate bad enough that
+nobody would choose it as a strategy. It is not an economy, it is a floor: lose everything
+and you recover, slowly and humiliatingly, but you recover.
+
+### Position is worth what it can reach
+
+Two arks in the same system are not equal. What matters is what lies within fuel range —
+how many planets, moons and asteroids, and how rich. **A good position is one with
+something worth scraping around it.**
+
+This is also where the pressure comes from. Fifty arks in a system reach for the same
+rocks, so conflict does not need a pretext: it is in the geometry from the first day.
 
 ## Personal safety, collective risk
+
+The economy living outside the ark changes what a war is about. Most of what a player owns
+is exposed by design — complexes on distant rocks, convoys in transit — and losses there
+are **frequent and small** rather than rare and catastrophic. That fits a phone-shaped
+audience far better than the reverse: a player with five minutes a day survives losing a
+mining complex and quits after losing everything overnight.
+
+### The ladder of targets
+
+| Target | Cost to the attacker | What it yields |
+|---|---|---|
+| Convoy in transit | cheap | whatever it carries |
+| Extraction complex | moderate | what has accumulated on site |
+| The ark itself | expensive, heavy losses | the stockpile at home |
+| Siege to destruction | enormous | removal of a rival |
+
+Each rung has its own role and none replaces the others.
+
+**The ark can be raided, and it must be.** Convoys bring material home, so a stockpile
+accumulates there; an ark that could not be touched would make hoarding optimal and reaching
+outward pointless, which is the opposite of the design. But its defence is strong and an
+attacker takes real losses, so raiding an ark is a clan operation for a serious prize
+rather than a way to farm a neighbour.
+
+### Destruction
 
 **An ark can be destroyed — by a siege, never by a raid, and never quickly.**
 
 An earlier version of this document made the primary base indestructible, for a good
 reason: the genre's classic failure is a player losing everything while asleep and never
-returning. That reason still holds. What did not hold is the mechanic, because finite slots
-and immortal bases contradict each other — after six months a sector fills with abandoned
-arks that nobody may remove, newcomers have nowhere to sit, and the world loses the ability
-to clean itself.
+returning. That reason still holds; what did not hold is a world that cannot clean itself,
+where a sector fills with abandoned arks nobody may remove.
 
 Making destruction merely *expensive* does not solve the original problem. Cost deters idle
 aggression, but not a clan that has decided you should go, which is exactly the case the
@@ -118,20 +164,21 @@ Blockade is not the alternative to this but its first stage: cut the target off,
 surroundings, then start on the hull.
 
 **Capture is not possible.** A hull nobody can breach cannot become someone else's home
-without destroying the very reason it was hard to breach. A fallen ark leaves wreckage and
-an empty slot.
+without destroying the very reason it was hard to breach. A fallen ark leaves wreckage.
 
-**The prize is the slot.** Sites are finite and the good ones are taken, so war is over
-land rather than over punishment. It also makes the world self-clearing: an abandoned ark
-is cheap to remove, because nobody defends it.
+**Open — what the attacker wins.** While the ark sat on a planetary site, the answer was
+that site. Now that the ark is a ship and what is finite is the *extraction targets* around
+it, removing a rival mainly means one fewer competitor for the same rocks, which is a
+thinner prize for an enormous cost. Either something else has to be at stake, or arks must
+occupy limited positions after all. This has to be settled before sieges are designed.
 
 ### Losing is a fork, not an exit
 
 A destroyed ark costs the base, not the account. The owner chooses:
 
-- **Stay** — rebuild here, with their clan, from nothing and on a worse site.
+- **Stay** — rebuild here, with their clan, from the synthesiser's floor upward.
 - **Leave** — the ark's last jump into the next world, which is already running because
-  worlds overlap. They arrive early, while it is empty and the good sites are open.
+  worlds overlap. They arrive early, while it is empty and the good positions are open.
 
 Leaving means **abandoning the clan**, and a clan is how you see anything at all, so it is
 not the easy option. The point is that defeat becomes a story rather than an ending.
@@ -142,9 +189,6 @@ Two rules keep this honest:
   purchase of escape from a lost war — see Monetisation.
 - **The jump does not work under siege.** Otherwise three days of pressure end with the
   target evaporating in the last minute. Leave before it starts, or after the ark falls.
-
-**Raiding stays available throughout.** An ark that cannot even be robbed makes turtling
-optimal: zero risk, zero pressure, no war.
 
 ## World lifecycle
 
@@ -287,15 +331,23 @@ Procedural generation is also consistent with the determinism already chosen for
 - **Siege length and cost** — the numbers, not the shape. Long enough that a clan in
   another timezone can respond, short enough that besieging is a decision rather than a
   campaign. Probably measured against how long a clan takes to muster, once that is known.
-- **What happens to the loser's stations** when the ark falls. Destroyed with it, or left
-  standing and ownerless? The second gives the attacker a reason beyond the slot, and gives
-  the defender something to lose beyond the ark.
-- **Who gets the freed slot** — the attacker by right, or does it simply open to anyone?
-  Awarding it rewards the effort; opening it turns a siege into a race and invites third
-  parties to arrive at the end. The second is more interesting and harder to balance.
-- **Where a newcomer's ark lands** — near other newcomers and away from developed players,
-  but the rule needs stating before the map generator exists.
-- **Resource set** — how many kinds, and whether they are symmetric.
+- **Can the ark move at all?** It is a ship now, which makes the question unavoidable.
+  Freely mobile breaks the distance model the whole map rests on, and permanently fixed
+  makes "ship" only a word. The leading answer is that it can move but as an *event*: days
+  of preparation, a ruinous amount of fuel, visible to everyone. Relocation then exists as
+  something earned rather than bought — see Monetisation, where buying it was rejected.
+- **What the attacker wins** by destroying an ark. Reopened by the economy moving outside;
+  see Personal safety, collective risk.
+- **What happens to the loser's extraction network** when the ark falls. Destroyed with it,
+  left dormant with a window to re-establish, or open to whoever arrives first. This decides
+  whether "rebuild here" is a real alternative to jumping to the next world, or strictly
+  worse and therefore not a choice at all.
+- **Where a newcomer's ark arrives** — near other newcomers and away from developed
+  players, but the rule needs stating before the map generator exists.
+- **Resource set.** Leading answer, three: **energy** (from nothing, passive), **fuel**
+  (synthesised from energy, buys reach), **material** (extracted outside, or synthesised at
+  a punitive rate). A fourth, rare and asteroid-only, is likely later so that asteroids are
+  worth a separate fight. Still to confirm before the quantity engine is written.
 - **Warehouse overflow** — is the excess lost, or does production stop? Blocks the time
   model ADR.
 - **Upkeep and deficit** — what happens when consumption exceeds production, and whether
@@ -316,10 +368,13 @@ Procedural generation is also consistent with the determinism already chosen for
 - Server-authoritative: the client never computes anything the server trusts.
 - Resources are lazily evaluated; discrete events are scheduled deferred jobs.
 - Combat is deterministic and reproducible from a stored seed.
-- A base is a landed ark on a planet; a sector is a star system with a finite number of
-  sites. Stations are secondary and freely destructible.
-- An ark falls only to a long, public, interruptible siege. It is never captured, and the
-  prize is the freed slot.
+- A base is a ship — the ark that carried its owner out of the collapse.
+- The economy lives outside it. Solar energy accrues from nothing; fuel is synthesised and
+  buys reach; material is extracted by robotic complexes and hauled home in convoys.
+  Synthesis is always available and always a bad rate, so no position is ever terminal.
+- Everything worth taking is exposed: convoys, complexes, and the stockpile at home. An ark
+  can be raided, but its defence is strong and the attacker pays for it.
+- An ark falls only to a long, public, interruptible siege, and is never captured.
 - A defeated player keeps the account and chooses: rebuild, or jump to the next world and
   leave the clan behind. The jump is never sold and never works under siege.
 - One client ships at launch; whether it is mobile or web is not decided. The design
