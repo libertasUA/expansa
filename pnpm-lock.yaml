@@ -12,7 +12,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/core/kernel:
+  kernel:
     devDependencies:
       typescript:
         specifier: ^5.9.3
@@ -22,7 +22,7 @@ importers:
     dependencies:
       '@expansa/kernel':
         specifier: workspace:*
-        version: link:../packages/core/kernel
+        version: link:../kernel
       '@nestjs/common':
         specifier: ^11.1.28
         version: 11.1.28(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)

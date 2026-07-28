@@ -1,9 +1,13 @@
-# Contour boundaries are workspace packages, not directories: a package cannot
-# import what its package.json does not declare, which is what makes the boundary
-# hold without anyone remembering it. See ADR 0003.
+# Contour boundaries are workspace packages, and the repository root states the
+# architecture: kernel and platform are Contour 1, engines are Contour 2, content
+# and server are Contour 3. A package cannot import what its package.json does not
+# declare, which is what makes the boundary hold without anyone remembering it.
+# See ADR 0004.
 packages:
+  - kernel
+  - platform
+  - engines/*
+  - contracts
+  - content
   - server
   - clients/*
-  - packages/*
-  - packages/core/*
-  - packages/engines/*
