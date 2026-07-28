@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // The same sources emitted as ESM for client bundlers. Nothing consumes this
+    // yet — no client exists — but building it from the first commit is what
+    // keeps CommonJS-only idioms (require, __dirname, export =) from creeping
+    // into a package that is supposed to be portable.
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+
+    "outDir": "./dist/esm",
+    "tsBuildInfoFile": "./dist/esm.tsbuildinfo",
+
+    // Not part of the project-reference graph: only the CommonJS build is
+    // referenced by the server, and declarations are shipped from it alone so
+    // the two outputs cannot disagree on a type.
+    "composite": false,
+    "declaration": false
+  }
+}

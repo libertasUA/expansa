@@ -1,4 +1,9 @@
+# Contour boundaries are workspace packages, not directories: a package cannot
+# import what its package.json does not declare, which is what makes the boundary
+# hold without anyone remembering it. See ADR 0003.
 packages:
   - server
-  - mobile
+  - clients/*
   - packages/*
+  - packages/core/*
+  - packages/engines/*

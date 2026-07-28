@@ -1,0 +1,19 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    // CommonJS output, consumed by the server. The ESM twin is built by
+    // tsconfig.esm.json for client bundlers; see the package exports map.
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    // Required for project references: the server depends on this project and
+    // `tsc -b` needs the emitted declarations plus a build info file.
+    "composite": true,
+
+    "outDir": "./dist/cjs",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/cjs.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

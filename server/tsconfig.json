@@ -3,8 +3,8 @@
   "compilerOptions": {
     // CommonJS, not ESM. The NestJS CLI, its watch mode, and decorator metadata
     // emission are all built around CJS; ESM support exists but is fragile enough
-    // that it is not worth spending debugging budget on. Code shared with the
-    // mobile client lives in packages/shared and stays ESM-compatible.
+    // that it is not worth spending debugging budget on. Portable packages ship a
+    // matching ESM build for client bundlers — see ADR 0003.
     "module": "commonjs",
     "moduleResolution": "node",
 
@@ -15,6 +15,7 @@
     "baseUrl": "./",
     "rootDir": "./src"
   },
+  "references": [{ "path": "../packages/core/kernel" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -7,5 +7,11 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "scripts": {}
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --force"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }

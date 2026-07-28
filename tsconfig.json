@@ -1,0 +1,14 @@
+{
+  // Solution file. Holds no sources of its own — `tsc -b` reads the references
+  // and builds each project after its dependencies.
+  //
+  // This is the second thing enforcing contour boundaries after pnpm: TypeScript
+  // refuses to resolve a package that is not in a project's `references`, so a
+  // Contour 2 engine cannot reach the server runtime even if someone adds the
+  // dependency to package.json by hand.
+  "files": [],
+  "references": [
+    { "path": "./packages/core/kernel" },
+    { "path": "./server" }
+  ]
+}
