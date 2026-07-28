@@ -12,6 +12,19 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  engines/quantity:
+    dependencies:
+      '@expansa/kernel':
+        specifier: workspace:*
+        version: link:../../kernel
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   kernel:
     devDependencies:
       typescript:

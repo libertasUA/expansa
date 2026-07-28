@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // CommonJS output, consumed by the server. The ESM twin is built by
+    // tsconfig.esm.json for client bundlers; see the package exports map.
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    // Required for project references: the server depends on this project and
+    // `tsc -b` needs the emitted declarations plus a build info file.
+    "composite": true,
+
+    // No ambient type packages. @types/node is a devDependency for the tests, and
+    // without this the engine could reach for `process` or `Buffer` and still
+    // compile — silently ending its portability to a client bundle.
+    "types": [],
+
+    "outDir": "./dist/cjs",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/cjs.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"],
+  "references": [{ "path": "../../kernel" }]
+}

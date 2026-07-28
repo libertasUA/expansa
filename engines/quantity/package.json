@@ -1,0 +1,30 @@
+{
+  "name": "@expansa/engine-quantity",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Contour 2 \u2014 quantities that accumulate at a rate and stop at a ceiling",
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cjs/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json && tsc -p tsconfig.esm.json && node scripts/mark-esm-output.mjs",
+    "typecheck": "tsc -b --force tsconfig.json",
+    "test": "tsc -p tsconfig.test.json && node --test \"dist/test/**/*.test.js\""
+  },
+  "dependencies": {
+    "@expansa/kernel": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^24.13.3"
+  }
+}
