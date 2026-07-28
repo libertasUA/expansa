@@ -1,88 +1,194 @@
 :root {
   color-scheme: dark;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  background: #0b0e14;
+  background: #05070d;
   color: #c8d0dc;
 }
 
-body { margin: 0; }
+body {
+  margin: 0;
+  min-height: 100vh;
+}
 
-.ark {
-  max-width: 32rem;
+/* Scenery sits behind everything and is never interactive: the panel above it
+   must stay clickable, and a full-viewport SVG would otherwise swallow events. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  gap: 2rem;
+  align-items: center;
+  min-height: 100vh;
+  max-width: 64rem;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Narrow screens stack: the hull reads at any width, the panel does not want to
+   be squeezed beside it. */
+@media (max-width: 48rem) {
+  .scene {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+.ark-hull {
+  width: 100%;
+  max-height: min(85vh, 46rem);
+  /* The hull is a dark shape against a lit planet; a drop shadow keeps its
+     silhouette from dissolving into the terminator. */
+  filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.85));
+}
+
+.compartment {
+  cursor: pointer;
+}
+
+.compartment rect:first-of-type {
+  transition: stroke 120ms ease;
+}
+
+.compartment:hover rect:first-of-type {
+  stroke: #5a7794;
+}
+
+.compartment.dormant:hover rect:first-of-type {
+  stroke: #3d4d61;
+}
+
+.panel {
+  padding: 1.25rem;
+  background: rgba(7, 11, 18, 0.66);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(90, 120, 160, 0.14);
+  border-radius: 8px;
 }
 
 h1 {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.35em;
   text-transform: uppercase;
   color: #5c6b80;
-  margin: 0 0 2rem;
+  margin: 0 0 1.25rem;
 }
 
-.quantities { margin: 0 0 2rem; }
+.quantities {
+  margin: 0 0 1.25rem;
+}
 
 .quantity {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #1b2130;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(90, 120, 160, 0.1);
 }
 
 dt {
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 0.15em;
   color: #5c6b80;
 }
 
-dd { margin: 0; }
+dd {
+  margin: 0;
+}
 
 .amount {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   /* Tabular figures: without them the counter jitters as digit widths change. */
   font-variant-numeric: tabular-nums;
   color: #e6edf5;
 }
 
-.capacity { color: #3d4757; }
+.capacity {
+  color: #3d4757;
+  font-size: 0.85rem;
+}
 
 .rate {
-  margin-left: 0.75rem;
-  font-size: 0.8rem;
+  margin-left: 0.6rem;
+  font-size: 0.75rem;
   color: #3f7d5a;
 }
 
 button {
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.75rem;
   font: inherit;
+  font-size: 0.85rem;
   color: #c8d0dc;
-  background: #151b26;
+  background: rgba(21, 27, 38, 0.8);
   border: 1px solid #263041;
   border-radius: 4px;
   cursor: pointer;
 }
 
-button:hover:not(:disabled) { background: #1b2230; }
-button:disabled { opacity: 0.4; cursor: default; }
+button:hover:not(:disabled) {
+  background: rgba(30, 39, 54, 0.9);
+}
 
-.error { color: #b4707a; font-size: 0.85rem; }
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.waiting,
+.error {
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #b4707a;
+}
 
 .pending {
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0;
-  font-size: 0.85rem;
+  margin: 0.85rem 0 0;
+  font-size: 0.8rem;
   color: #7d8aa0;
 }
 
 .note {
-  margin-top: 3rem;
-  font-size: 0.75rem;
-  line-height: 1.6;
-  color: #3d4757;
+  margin: 1.5rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.7;
+  color: #46536a;
+}
+
+.cell {
+  cursor: pointer;
+}
+
+.cell path:first-of-type {
+  transition: stroke 120ms ease, fill 120ms ease;
+}
+
+.cell:hover path:first-of-type {
+  stroke: #5a7794;
+}
+
+.cell.empty:hover path:first-of-type {
+  fill: #101722;
+}
+
+/* A locked ring is not dimmed decoration — it is unreachable, so it must not
+   invite a click. */
+.cell.locked {
+  cursor: default;
+  opacity: 0.55;
 }
