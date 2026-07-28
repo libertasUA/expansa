@@ -25,6 +25,8 @@ export interface Body {
   /** Slots you can see as taken. Null when the orbit has never been observed. */
   readonly occupied: number | null;
   readonly home?: boolean;
+  /** Which slot holds your own ark, when this is your planet. */
+  readonly yourSlot?: number;
 }
 
 interface SystemMapProps {
@@ -34,7 +36,7 @@ interface SystemMapProps {
   readonly onSelect?: (id: string) => void;
 }
 
-const CENTRE = 400;
+const CENTRE = 430;
 
 export function SystemMap({
   bodies,
@@ -47,7 +49,7 @@ export function SystemMap({
   return (
     <svg
       className="system"
-      viewBox="0 0 800 800"
+      viewBox="0 0 860 860"
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="The system"
@@ -115,8 +117,8 @@ export function SystemMap({
           </g>
         ))}
 
-      <circle cx={CENTRE} cy={CENTRE} r="250" fill="url(#sun)" />
-      <circle cx={CENTRE} cy={CENTRE} r="17" fill="#fffbf2" />
+      <circle cx={CENTRE} cy={CENTRE} r="270" fill="url(#sun)" />
+      <circle cx={CENTRE} cy={CENTRE} r="21" fill="#fffbf2" />
 
       {layout
         .filter((body) => body.kind === 'planet')
@@ -132,19 +134,63 @@ export function SystemMap({
             >
               {/* Generous invisible target: the planets are small and this is a
                   touch screen as often as not. */}
-              <circle cx={body.x} cy={body.y} r={Math.max(body.size + 16, 26)} fill="transparent" />
+              <circle cx={body.x} cy={body.y} r={Math.max(body.size + 20, 30)} fill="transparent" />
 
               <circle cx={body.x} cy={body.y} r={body.size} fill={`url(#body-${body.id})`} />
+
+              {/* One mark per orbital slot. How many there are is public
+                  astronomy; who is in them is not, so an unobserved planet shows
+                  its slots as empty outlines rather than as free berths. */}
+              <g className="slots">
+                {Array.from({ length: body.slots }, (_, slot) => {
+                  const angle = (slot / body.slots) * Math.PI * 2 - Math.PI / 2;
+                  const ring = body.size + 13;
+                  const sx = body.x + ring * Math.cos(angle);
+                  const sy = body.y + ring * Math.sin(angle);
+                  const known = body.occupied !== null;
+                  const taken = known && slot < body.occupied;
+                  const mine = body.yourSlot === slot;
+
+                  if (mine) {
+                    return (
+                      <g key={slot}>
+                        <circle cx={sx} cy={sy} r="5.5" fill="#7fb6d8" />
+                        <circle
+                          cx={sx}
+                          cy={sy}
+                          r="9"
+                          fill="none"
+                          stroke="#7fb6d8"
+                          strokeWidth="1"
+                          opacity="0.7"
+                        />
+                      </g>
+                    );
+                  }
+
+                  return (
+                    <circle
+                      key={slot}
+                      cx={sx}
+                      cy={sy}
+                      r={taken ? 4 : 3}
+                      fill={taken ? '#5d7d9c' : 'none'}
+                      stroke={taken ? 'none' : known ? '#334357' : '#2a3646'}
+                      strokeWidth="1.2"
+                    />
+                  );
+                })}
+              </g>
 
               {body.home === true && (
                 <circle
                   cx={body.x}
                   cy={body.y}
-                  r={body.size + 11}
+                  r={body.size + 22}
                   fill="none"
-                  stroke="#7fb6d8"
-                  strokeWidth="1.2"
-                  opacity="0.8"
+                  stroke="#3c5f7d"
+                  strokeWidth="1"
+                  opacity="0.55"
                 />
               )}
 
@@ -152,7 +198,7 @@ export function SystemMap({
                 <circle
                   cx={body.x}
                   cy={body.y}
-                  r={body.size + 17}
+                  r={body.size + 28}
                   fill="none"
                   stroke="#c8d0dc"
                   strokeWidth="1"
@@ -162,7 +208,7 @@ export function SystemMap({
 
               <text
                 x={body.x}
-                y={body.y + body.size + 24}
+                y={body.y + body.size + 36}
                 textAnchor="middle"
                 className="body-label"
               >
@@ -171,7 +217,7 @@ export function SystemMap({
 
               <text
                 x={body.x}
-                y={body.y + body.size + 38}
+                y={body.y + body.size + 50}
                 textAnchor="middle"
                 className={body.occupied === null ? 'body-unknown' : 'body-known'}
               >
@@ -216,7 +262,7 @@ function layOut(bodies: readonly Body[], seed: number): readonly LaidOut[] {
   const random = seededRandom(seed);
 
   return bodies.map((body, index) => {
-    const radius = 92 + body.orbit * 46;
+    const radius = 96 + body.orbit * 45;
     const angle = random() * Math.PI * 2;
     const x = CENTRE + radius * Math.cos(angle);
     const y = CENTRE + radius * Math.sin(angle);
@@ -242,7 +288,7 @@ function layOut(bodies: readonly Body[], seed: number): readonly LaidOut[] {
       x,
       y,
       // Slot count drives size: a bigger world holds more arks.
-      size: body.kind === 'belt' ? 0 : 7 + body.slots * 0.9,
+      size: body.kind === 'belt' ? 0 : 13 + body.slots * 1.5,
       base: palette[0],
       highlight: palette[1],
       towardsStar: { x: Math.cos(angle), y: Math.sin(angle) },

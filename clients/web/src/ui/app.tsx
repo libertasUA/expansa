@@ -41,7 +41,7 @@ const COMPARTMENTS: readonly Compartment[] = Array.from({ length: 40 }, (_, inde
 const BODIES: readonly Body[] = [
   { id: 'i', name: 'Kerith I', kind: 'planet', orbit: 0, slots: 4, occupied: null },
   { id: 'ii', name: 'Kerith II', kind: 'planet', orbit: 1, slots: 8, occupied: null },
-  { id: 'iii', name: 'Kerith III', kind: 'planet', orbit: 2, slots: 8, occupied: 6, home: true },
+  { id: 'iii', name: 'Kerith III', kind: 'planet', orbit: 2, slots: 8, occupied: 6, home: true, yourSlot: 0 },
   { id: 'belt', name: 'The Scatter', kind: 'belt', orbit: 3, slots: 0, occupied: null },
   { id: 'iv', name: 'Kerith IV', kind: 'planet', orbit: 4, slots: 10, occupied: null },
   { id: 'v', name: 'Kerith V', kind: 'planet', orbit: 5, slots: 6, occupied: null },
