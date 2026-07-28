@@ -21,6 +21,8 @@ below, these win and the section below is what needs updating.
   still being far enough apart from one another.
 - Players are **not visible by default**. Finding them requires either launching **probes**
   or building **static reconnaissance outposts**, and those outposts can be destroyed.
+  *Refined by the author: bodies are public astronomy and your own orbit is free to watch;
+  what is hidden is everything around every other planet. See The spine.*
 - Players can enter into **agreements**: resource-exchange deals and non-aggression pacts.
   These are in-game contracts rather than informal chat arrangements.
 - **Asteroids appear on the map from time to time** as finite, depletable resource
@@ -41,18 +43,55 @@ below, these win and the section below is what needs updating.
 
 ## The spine: intelligence is what makes clans necessary
 
-Three of the rules above are one idea, and it is the most valuable thing in the concept.
-Players are invisible, reconnaissance is expensive and destructible, and clans are the
-centre. Together they mean **scouting is expensive for an individual and cheap for a
-group**, because intelligence pools: fifty people sharing a map see a sector none of them
-could see alone.
+The most valuable idea in the concept, and the one every mechanic should be checked
+against: **scouting is expensive for an individual and cheap for a group**, so a clan is
+not a convenience but an organ of perception. Without one you are blind.
 
-In the genre's usual form an alliance is chat plus coordinated defence — a convenience. In
-Expansa the clan is an **organ of perception**: without one you are blind. A player joins a
-clan not because it is more efficient but because otherwise they are not playing the game.
+What is hidden is not *where people are* but *what they are doing*.
 
-Every mechanic should be checked against this: does it strengthen the fact that seeing
-requires other people?
+### Where the fog sits
+
+**Bodies are public astronomy.** Every planet, moon and large asteroid in a system is on
+everyone's map from the first day, along with how many orbital slots each planet has. The
+map is complete and empty.
+
+**Occupancy is not.** Who sits in those slots, what is built on those rocks, and how strong
+any of it is — none of that is on the map until someone looks.
+
+**Your own orbit is free.** You hang a few thousand kilometres from the other arks around
+your planet, so you see them and their movements permanently and at no cost. That is where
+the value of neighbourhood comes from: watching your own is free, watching anyone else's
+is not.
+
+**Every other planet is dark** — including the ones in your own system, a few days' flight
+away. A planet is visible; what orbits it, at interplanetary distance, is not.
+
+### Why this makes the clan necessary, arithmetically
+
+> One player watches **one orbit**. A clan with members around five planets watches **five**.
+
+Not because it bought better sensors, but because each member watches their own doorstep
+for free and shares it. That is the whole mechanism, and it operates every day rather than
+in occasional expeditions.
+
+### Intelligence perishes, which is the point
+
+A position learned once is known forever. Fleet strength, a departed convoy, a siege just
+begun — all of it is stale within hours. So observation is continuous work rather than a
+purchase, and continuous work over fifty neighbours is physically impossible alone.
+
+This gives the two reconnaissance tools distinct jobs: a **probe** takes a snapshot of one
+target and the answer rots by evening; a **reconnaissance outpost** watches a region
+continuously, catching fleets launching and convoys leaving, and can be destroyed by
+whoever objects to being watched.
+
+### Scouting is economic before it is military
+
+You also do not know **which moons and asteroids are already being worked**. Sending a
+complex to an occupied rock wastes the fuel that got it there.
+
+Everyone extracts; not everyone fights. So the everyday reason to scout is finding free
+ground, and the military use rides on infrastructure that pays for itself.
 
 ## What a base is
 
@@ -104,11 +143,31 @@ So the synthesiser produces **basic material as well as fuel**, at a rate bad en
 nobody would choose it as a strategy. It is not an economy, it is a floor: lose everything
 and you recover, slowly and humiliatingly, but you recover.
 
-### Position is worth what it can reach
+### Where an ark sits
 
-Two arks in the same system are not equal. What matters is what lies within fuel range —
-how many planets, moons and asteroids, and how rich. **A good position is one with
-something worth scraping around it.**
+**A sector is a solar system.** It holds several planets, and each planet has a fixed
+number of **orbital slots**. An ark occupies one of them.
+
+That gives two levels of geography with different jobs:
+
+- **Between systems** — a graph. Gates, and clan outposts that grant entry. The strategic
+  scale, crossed rarely.
+- **Inside a system** — planets at distances paid for in fuel. The operational scale, used
+  daily.
+
+Slots being fixed is what makes the map a graph rather than a plane: an ark is at a
+position, not at a coordinate, and distance is the cost of travelling between positions.
+
+**The planet you orbit is your neighbourhood.** Seven or so arks around the same planet see
+each other permanently, compete for the same nearby rocks, and are the first people any of
+them will ever deal with. Fifty players in a system is too many to know; the people around
+your planet are a village.
+
+Planets are not equal, and the difference is already implied by the economy: energy is
+solar, so **an inner planet earns more of it than an outer one**. Add differing slot counts
+and differing bodies within reach, and the inner system is expensive property while the
+outskirts are where you go when nothing better is free. No bonus table required — it falls
+out of the physics already chosen.
 
 This is also where the pressure comes from. Fifty arks in a system reach for the same
 rocks, so conflict does not need a pretext: it is in the geometry from the first day.
@@ -166,11 +225,10 @@ surroundings, then start on the hull.
 **Capture is not possible.** A hull nobody can breach cannot become someone else's home
 without destroying the very reason it was hard to breach. A fallen ark leaves wreckage.
 
-**Open — what the attacker wins.** While the ark sat on a planetary site, the answer was
-that site. Now that the ark is a ship and what is finite is the *extraction targets* around
-it, removing a rival mainly means one fewer competitor for the same rocks, which is a
-thinner prize for an enormous cost. Either something else has to be at stake, or arks must
-occupy limited positions after all. This has to be settled before sieges are designed.
+**The prize is the orbital slot.** Slots around a planet are fixed and the inner ones are
+taken, so a siege is fought over a specific address rather than over punishment. It also
+makes the world self-clearing: an abandoned ark is cheap to remove, because nobody defends
+it, and its slot returns to circulation.
 
 ### Losing is a fork, not an exit
 
@@ -336,8 +394,14 @@ Procedural generation is also consistent with the determinism already chosen for
   makes "ship" only a word. The leading answer is that it can move but as an *event*: days
   of preparation, a ruinous amount of fuel, visible to everyone. Relocation then exists as
   something earned rather than bought — see Monetisation, where buying it was rejected.
-- **What the attacker wins** by destroying an ark. Reopened by the economy moving outside;
-  see Personal safety, collective risk.
+- **Slots per player.** With fifty in a system, roughly one orbital slot each — say six to
+  eight planets with six to ten slots apiece, fewer and more expensive close to the star.
+  Much more and slots stop being scarce; much less and most players hold no address worth
+  defending.
+- **Whether static bases share the orbital pool.** A planet could have one set of positions
+  occupied by arks and permanent surface bases alike, or two separate sets. One pool is a
+  single `slots` table and no special cases; two make a planet contested at two levels at
+  once.
 - **What happens to the loser's extraction network** when the ark falls. Destroyed with it,
   left dormant with a window to re-establish, or open to whoever arrives first. This decides
   whether "rebuild here" is a real alternative to jumping to the next world, or strictly
@@ -368,13 +432,17 @@ Procedural generation is also consistent with the determinism already chosen for
 - Server-authoritative: the client never computes anything the server trusts.
 - Resources are lazily evaluated; discrete events are scheduled deferred jobs.
 - Combat is deterministic and reproducible from a stored seed.
-- A base is a ship — the ark that carried its owner out of the collapse.
+- A base is a ship — the ark that carried its owner out of the collapse — and it occupies
+  a fixed orbital slot around a planet. A sector is a solar system with several planets.
+- Bodies are public astronomy; occupancy is not. Your own orbit is free to watch, every
+  other planet is dark, and a clan sees as many orbits as it has neighbourhoods.
 - The economy lives outside it. Solar energy accrues from nothing; fuel is synthesised and
   buys reach; material is extracted by robotic complexes and hauled home in convoys.
   Synthesis is always available and always a bad rate, so no position is ever terminal.
 - Everything worth taking is exposed: convoys, complexes, and the stockpile at home. An ark
   can be raided, but its defence is strong and the attacker pays for it.
-- An ark falls only to a long, public, interruptible siege, and is never captured.
+- An ark falls only to a long, public, interruptible siege, and is never captured. The
+  prize is its orbital slot.
 - A defeated player keeps the account and chooses: rebuild, or jump to the next world and
   leave the clan behind. The jump is never sold and never works under siege.
 - One client ships at launch; whether it is mobile or web is not decided. The design
