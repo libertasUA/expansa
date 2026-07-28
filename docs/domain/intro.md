@@ -31,6 +31,8 @@ below, these win and the section below is what needs updating.
 - Clans can build **clan outposts**, which grant entry into a sector.
 - A player can hold **more than one base**. Secondary bases can be destroyed or captured,
   but the **primary base is never lost**.
+  *Superseded by the author: the primary base can fall to a long, visible, interruptible
+  siege — never to a raid, and never to capture. See Personal safety, collective risk.*
 - Military strength is an **interstellar fleet**.
 - Tentative: a **flexible weapon upgrade system**, so ships are configured rather than
   merely unlocked.
@@ -52,16 +54,97 @@ clan not because it is more efficient but because otherwise they are not playing
 Every mechanic should be checked against this: does it strengthen the fact that seeing
 requires other people?
 
+## What a base is
+
+**A landed ark on a planet.** The ship that carried its owner out of the collapse, set down
+and never flying again.
+
+The choice answers four questions at once, which is why it wins over a station, a bare
+planet, or an asteroid base:
+
+- **It cannot move.** Not by rule but by nature — it landed. Distance stays meaningful as
+  path length through the sector graph, so blockade and siege mean something.
+- **Slots are finite.** A sector is a star system with a fixed number of planetary sites,
+  around fifty. The "fifty players per sector" figure becomes a property of the world
+  rather than a tuning value, and land becomes something to fight over.
+- **Its hull explains its toughness.** It is technology of the fallen civilisation, which
+  the survivors can neither reproduce nor easily breach. The reason lives in the fiction
+  instead of in the rulebook.
+- **It does not collide with asteroids**, which stay what they are: a separate, finite,
+  contested resource.
+
+Everyone having "the last ark" is answered by the same collapse: arks were built in
+thousands during the evacuation and most were lost. They are common among survivors
+precisely because only their passengers survived.
+
+**One ark per planet.** Other players may hold stations in orbit above it, which is what
+makes a blockade physical rather than abstract — the enemy is literally overhead.
+
+### Ark and stations
+
+> **The ark is your economy. Stations are your reach.**
+
+The ark produces and stores, and you always have one. Stations mine asteroids, hold gates,
+carry reconnaissance and stage fleets — and they can be destroyed and captured freely.
+
+This is what a war actually takes from you: everything built outward, while the thing that
+keeps you playing is far harder to remove.
+
 ## Personal safety, collective risk
 
-The primary base cannot be destroyed or captured; secondary bases and clan outposts can.
-Losing a war costs territory, sector access, and secondary holdings — never the account.
+**An ark can be destroyed — by a siege, never by a raid, and never quickly.**
 
-This is a deliberate fit for a mobile audience. The genre's classic failure is a player
-losing everything while asleep and never returning.
+An earlier version of this document made the primary base indestructible, for a good
+reason: the genre's classic failure is a player losing everything while asleep and never
+returning. That reason still holds. What did not hold is the mechanic, because finite slots
+and immortal bases contradict each other — after six months a sector fills with abandoned
+arks that nobody may remove, newcomers have nowhere to sit, and the world loses the ability
+to clean itself.
 
-**The invulnerability covers destruction and capture, not raiding.** A primary base that
-cannot even be robbed makes turtling optimal: zero risk, zero pressure, no war.
+Making destruction merely *expensive* does not solve the original problem. Cost deters idle
+aggression, but not a clan that has decided you should go, which is exactly the case the
+rule existed to cover. **Duration and visibility solve it.** Destroying an ark requires a
+siege that:
+
+- runs for **days**, not hours
+- is **publicly visible** from the first hour — to the target, their clan, and the
+  neighbourhood
+- is **interruptible**: break the siege and the timer resets
+- is **expensive** for the attacker, so it is not done out of boredom
+
+The loss then reads as "my clan did not relieve me in three days" rather than "I was
+robbed in my sleep". It is a clan-scale event, which is what this design is built around.
+Blockade is not the alternative to this but its first stage: cut the target off, strip the
+surroundings, then start on the hull.
+
+**Capture is not possible.** A hull nobody can breach cannot become someone else's home
+without destroying the very reason it was hard to breach. A fallen ark leaves wreckage and
+an empty slot.
+
+**The prize is the slot.** Sites are finite and the good ones are taken, so war is over
+land rather than over punishment. It also makes the world self-clearing: an abandoned ark
+is cheap to remove, because nobody defends it.
+
+### Losing is a fork, not an exit
+
+A destroyed ark costs the base, not the account. The owner chooses:
+
+- **Stay** — rebuild here, with their clan, from nothing and on a worse site.
+- **Leave** — the ark's last jump into the next world, which is already running because
+  worlds overlap. They arrive early, while it is empty and the good sites are open.
+
+Leaving means **abandoning the clan**, and a clan is how you see anything at all, so it is
+not the easy option. The point is that defeat becomes a story rather than an ending.
+
+Two rules keep this honest:
+
+- **The jump is never sold.** Not for money, not as a subscription perk. It would be a
+  purchase of escape from a lost war — see Monetisation.
+- **The jump does not work under siege.** Otherwise three days of pressure end with the
+  target evaporating in the last minute. Leave before it starts, or after the ark falls.
+
+**Raiding stays available throughout.** An ark that cannot even be robbed makes turtling
+optimal: zero risk, zero pressure, no war.
 
 ## World lifecycle
 
@@ -201,12 +284,17 @@ Procedural generation is also consistent with the determinism already chosen for
 
 ## Open questions
 
-- **What a base physically is** — station, planet, or something else. It decides whether
-  bases can move (which would break the distance model), whether sector slots are finite
-  (which is where scarcity would come from), and whether it collides with asteroids as a
-  separate contested entity. The strongest candidate: a sector is a star system with a
-  finite number of planetary slots, around fifty, which makes the fifty-player figure a
-  physical property of the world rather than a tuning value.
+- **Siege length and cost** — the numbers, not the shape. Long enough that a clan in
+  another timezone can respond, short enough that besieging is a decision rather than a
+  campaign. Probably measured against how long a clan takes to muster, once that is known.
+- **What happens to the loser's stations** when the ark falls. Destroyed with it, or left
+  standing and ownerless? The second gives the attacker a reason beyond the slot, and gives
+  the defender something to lose beyond the ark.
+- **Who gets the freed slot** — the attacker by right, or does it simply open to anyone?
+  Awarding it rewards the effort; opening it turns a siege into a race and invites third
+  parties to arrive at the end. The second is more interesting and harder to balance.
+- **Where a newcomer's ark lands** — near other newcomers and away from developed players,
+  but the rule needs stating before the map generator exists.
 - **Resource set** — how many kinds, and whether they are symmetric.
 - **Warehouse overflow** — is the excess lost, or does production stop? Blocks the time
   model ADR.
@@ -228,6 +316,12 @@ Procedural generation is also consistent with the determinism already chosen for
 - Server-authoritative: the client never computes anything the server trusts.
 - Resources are lazily evaluated; discrete events are scheduled deferred jobs.
 - Combat is deterministic and reproducible from a stored seed.
+- A base is a landed ark on a planet; a sector is a star system with a finite number of
+  sites. Stations are secondary and freely destructible.
+- An ark falls only to a long, public, interruptible siege. It is never captured, and the
+  prize is the freed slot.
+- A defeated player keeps the account and chooses: rebuild, or jump to the next world and
+  leave the clan behind. The jump is never sold and never works under siege.
 - One client ships at launch; whether it is mobile or web is not decided. The design
   still assumes a phone-shaped audience — short sessions, no 3 a.m. alarms — which is a
   statement about players rather than about the platform.
