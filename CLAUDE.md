@@ -87,6 +87,9 @@ Decided — see the linked ADR for reasoning, do not re-litigate without one:
 - Server framework: NestJS 11 on the Fastify adapter — ADR 0001
 - Repository layout: contours are workspace packages, Contour 1 split by portability
   — ADR 0003
+- Authentication is **stubbed**, and fails closed. Every route requires a principal
+  unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
+  refuses to boot. Use cases take a `Principal`, never a request or a token.
 - Database: PostgreSQL 18
 - Local development runs in Docker Compose: PostgreSQL plus a Node container that
   hosts the server and pnpm. The client toolchain stays on the host — a mobile one
@@ -146,6 +149,11 @@ docker compose up -d          # postgres + server, server hot-reloads
 docker compose logs -f server
 docker compose exec server pnpm --filter @expansa/server typecheck
 curl localhost:3000/health
+
+# Authenticated endpoints: in stub mode the bearer token IS the account id,
+# so any UUID works and no sign-in flow exists yet.
+curl -H "Authorization: Bearer 3f6b1c22-9a44-4c31-8b7e-2d5a90ff1e07" \
+     localhost:3000/v1/me
 ```
 
 Notes that will otherwise cost time:
