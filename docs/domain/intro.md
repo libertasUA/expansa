@@ -228,4 +228,7 @@ Procedural generation is also consistent with the determinism already chosen for
 - Server-authoritative: the client never computes anything the server trusts.
 - Resources are lazily evaluated; discrete events are scheduled deferred jobs.
 - Combat is deterministic and reproducible from a stored seed.
-- Mobile only. One world at launch, `world_id` in the schema from day one.
+- One client ships at launch; whether it is mobile or web is not decided. The design
+  still assumes a phone-shaped audience — short sessions, no 3 a.m. alarms — which is a
+  statement about players rather than about the platform.
+- One world at launch, `world_id` in the schema from day one.
