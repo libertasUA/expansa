@@ -20,3 +20,7 @@ export {
 } from './time/timestamp';
 
 export { type Clock, type ManualClock, systemClock, manualClock } from './time/clock';
+
+export { type AccountId, accountId, isAccountId } from './id/account-id';
+
+export { type Principal } from './auth/principal';
