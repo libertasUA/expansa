@@ -15,7 +15,7 @@
     "baseUrl": "./",
     "rootDir": "./src"
   },
-  "references": [{ "path": "../packages/core/kernel" }],
+  "references": [{ "path": "../kernel" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

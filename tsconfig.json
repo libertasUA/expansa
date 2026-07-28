@@ -4,11 +4,11 @@
   //
   // This is the second thing enforcing contour boundaries after pnpm: TypeScript
   // refuses to resolve a package that is not in a project's `references`, so a
-  // Contour 2 engine cannot reach the server runtime even if someone adds the
+  // Contour 2 engine cannot reach the platform layer even if someone adds the
   // dependency to package.json by hand.
   "files": [],
   "references": [
-    { "path": "./packages/core/kernel" },
+    { "path": "./kernel" },
     { "path": "./server" }
   ]
 }
