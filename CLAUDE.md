@@ -221,8 +221,14 @@ Reasons that otherwise get rediscovered the expensive way:
 - **PostgreSQL 18 mounts `/var/lib/postgresql`**, not `/var/lib/postgresql/data` — 18+
   expects a version subdirectory so `pg_upgrade --link` works.
 - **Images are pinned to a major version, never `latest`.**
-- **Everything server-side runs in the container**; do not run pnpm on the host. The client
-  toolchain is the exception — a mobile one needs USB and emulators.
+- **Everything runs in the container**, including the web client's Vite server; do not run
+  pnpm on the host. A mobile client would be the exception, needing USB and emulators.
+- **Vite proxies `/v1` to the server**, so the browser sees one origin and there is no CORS
+  configuration to get wrong. It also polls for file changes, because a bind mount does not
+  deliver inotify events.
+- **pnpm blocks dependency install scripts**, which is the right default. `esbuild` is
+  allowed in `pnpm-workspace.yaml` because Vite cannot start without its native binary;
+  anything else added there is a deliberate exception.
 - Server is **CommonJS** (NestJS tooling requires it); portable packages emit both
   CommonJS and ESM so a client bundler can consume them — ADR 0004.
 - **Not TypeScript 7 yet**: `@nestjs/cli` still pins 5.9.x.
@@ -231,6 +237,10 @@ Reasons that otherwise get rediscovered the expensive way:
 
 - Runtime and framework: NestJS 11 on the Fastify adapter — ADR 0001
 - Repository layout: contours are workspace packages, rooted — ADR 0004 (supersedes 0003)
+- **The first client is web** — React on Vite, in `clients/web`. Chosen for the feedback
+  loop: no emulator, no store review, and a Steam build would be this client in a desktop
+  shell anyway. Mobile stays possible; `src/core` and `src/ui` are split from the first
+  commit so the shared half can be extracted when a second client appears.
 - Authentication is **stubbed**, and fails closed. Every route requires a principal
   unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
   refuses to boot. Use cases take a `Principal`, never a request or a token.
@@ -251,7 +261,6 @@ yet written down:
 
 Do not assume an answer; ask before writing code that depends on it.
 
-- Which client is built first — mobile or web
 - Validation and schema approach. Partly narrowed: the schema must execute in the client
   too, which rules out decorator-based `class-validator` DTOs as the only source
 - Job scheduler and queue — leaning toward a PostgreSQL-native queue, so that enqueueing is
@@ -266,8 +275,10 @@ Do not assume an answer; ask before writing code that depends on it.
 
 Gaps, recorded so they stay visible:
 
-- **No test runner.** Needed before the persistence layer, whose lock ordering and retry
-  behaviour is exactly the code that fails silently without tests.
+- **No test runner decision.** `node:test` is in use because it needs no adoption and no
+  configuration; #34 is still open, and it should be settled before the persistence layer,
+  whose lock ordering and retry behaviour is exactly the code that fails silently without
+  tests.
 - **No observability.** No structured logging, request ids, query timing or lock-wait
   visibility. We chose explicit row locks and currently could not see contention if it
   happened.
@@ -305,10 +316,12 @@ Everything server-side runs inside the compose stack; do not run pnpm on the hos
 
 ```bash
 cp .env.example .env          # first time only
-docker compose up -d          # postgres + server, server hot-reloads
+docker compose up -d          # postgres, server, web — all hot-reload
 docker compose logs -f server
 docker compose exec server pnpm typecheck        # every project
+docker compose exec server pnpm test             # every project that has tests
 curl localhost:3000/health
+open http://localhost:5173     # the web client
 
 # Authenticated endpoints: in stub mode the bearer token IS the account id,
 # so any UUID works and no sign-in flow exists yet.

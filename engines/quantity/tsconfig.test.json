@@ -1,0 +1,15 @@
+{
+  // Tests only. They are Node programs and may use Node globals; the engine they
+  // exercise may not, which is why this is a separate project rather than a flag
+  // on the main one.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "composite": false,
+    "declaration": false,
+    "outDir": "./dist/test",
+    "tsBuildInfoFile": "./dist/test.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -2,14 +2,15 @@
   "name": "expansa",
   "version": "0.0.0",
   "private": true,
-  "description": "Expansa — MMO strategy game",
+  "description": "Expansa \u2014 MMO strategy game",
   "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=24.0.0"
   },
   "scripts": {
     "build": "tsc -b",
-    "typecheck": "tsc -b --force"
+    "typecheck": "tsc -b --force",
+    "test": "pnpm -r test"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

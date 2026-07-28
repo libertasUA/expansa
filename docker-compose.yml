@@ -62,6 +62,25 @@ services:
     # `docker compose up`. The install is a no-op when node_modules is current.
     command: sh -c "pnpm install && pnpm --filter @expansa/server dev"
 
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: expansa-web
+    working_dir: /workspace
+    init: true
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    volumes:
+      - .:/workspace
+      - pnpm-store:/home/node/.local/share/pnpm/store
+    depends_on:
+      - server
+    # Waits for the server's build to produce the portable packages: Vite consumes
+    # the ESM half of engines/quantity from dist, which does not exist on a fresh
+    # clone until something has run tsc.
+    command: sh -c "pnpm install && pnpm --filter @expansa/engine-quantity build && pnpm --filter @expansa/web dev"
+
 volumes:
   postgres-data:
   pnpm-store:

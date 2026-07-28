@@ -15,7 +15,10 @@
     "baseUrl": "./",
     "rootDir": "./src"
   },
-  "references": [{ "path": "../kernel" }],
+  "references": [
+    { "path": "../kernel" },
+    { "path": "../engines/quantity" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
