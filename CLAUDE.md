@@ -15,8 +15,8 @@ of magnitude, so the product itself stays small enough to hold in one head.
 
 - **Contour 1 (Core Infrastructure)**: runtime, storage, transactions, concurrency,
   job execution, auth, observability, stable contracts and extension points. Written
-  rarely, carefully and expensively; heavily tested and profiled. Lives in /server core
-  modules, /packages/shared, /mobile core shell.
+  rarely, carefully and expensively; heavily tested and profiled. Split by portability
+  into `packages/core/kernel` and `packages/core/server-runtime` — see Repository Layout.
 - **Contour 2 (Parameterized Modules)**: product-independent capability engines. Each
   represents a *family* of scenarios and is reconfigured through schemas, metadata,
   policies and handlers — never through new branches. A Contour 2 module does not know
@@ -39,14 +39,54 @@ Naming a module after a game system is the failure mode this section exists to p
 a "building system" is one scenario in a folder, not an engine. The engine is a timed
 transformation; buildings are configuration.
 
+## Repository Layout
+
+Contours are **workspace packages, not directories** — ADR 0003. A package cannot import
+what its `package.json` does not declare, and TypeScript project references refuse the
+same import a second time, so the boundary holds without anyone remembering it.
+
+```
+packages/
+├── core/                     Contour 1
+│   ├── kernel/               portable, dependency-free: types, ports, pure functions
+│   └── server-runtime/       platform-bound: Postgres, transactions, jobs   (not yet)
+├── engines/                  Contour 2, one package per family of scenarios (not yet)
+├── contracts/                client ↔ server surface, versioned             (not yet)
+└── content/                  Contour 3 data                                 (not yet)
+server/                       Contour 3 code, and the only composition root
+clients/                      one package per client                         (not yet)
+```
+
+```
+server  →  engines  →  kernel
+   ↓                     ↑
+server-runtime ──────────┘
+```
+
+- **Contour 1 splits on portability, not purity.** `Date.now()` works identically in Node,
+  a browser and React Native, so the clock is `kernel`; a connection pool is not portable
+  and is `server-runtime`.
+- **An engine depends on `kernel` and on nothing else in the repository.** It declares
+  what it needs as a port, `server-runtime` implements it, `server` connects them. An
+  engine that needs anything more was drawn wrong.
+- **Portable packages build twice**, CommonJS for the server and ESM for a client bundler,
+  selected by the `exports` map. Declarations come from the CommonJS build only.
+- **Nothing is created before it holds something.** Packages marked *not yet* above exist
+  as a map, not as directories.
+- The build is a project-reference graph: `tsc -b` from the root, and the server's watch
+  loop rebuilds `kernel` on change. `nest build` is not used — it knows nothing about
+  references and would compile against stale declarations.
+
 ## Tech Stack
 
 Decided — see the linked ADR for reasoning, do not re-litigate without one:
 - Runtime: Node.js 24 LTS (24.18.0), TypeScript 5.9 strict — ADR 0001
-  - Server is **CommonJS** (NestJS tooling requires it); `packages/shared` stays
-    ESM-compatible for Metro
+  - Server is **CommonJS** (NestJS tooling requires it); portable packages emit both
+    CommonJS and ESM so a client bundler can consume them — ADR 0003
   - Not TypeScript 7 yet: `@nestjs/cli` still pins 5.9.x
 - Server framework: NestJS 11 on the Fastify adapter — ADR 0001
+- Repository layout: contours are workspace packages, Contour 1 split by portability
+  — ADR 0003
 - Database: PostgreSQL 18
 - Local development runs in Docker Compose: PostgreSQL plus a Node container that
   hosts the server and pnpm. The client toolchain stays on the host — a mobile one
@@ -111,8 +151,12 @@ curl localhost:3000/health
 Notes that will otherwise cost time:
 - If `docker compose` cannot reach a daemon, the active context is Docker Desktop and
   it is not running: `docker context use default`.
-- The dev loop is `tsc --watch` plus `node --watch`, *not* `nest start --watch` —
+- The dev loop is `tsc -b --watch` plus `node --watch`, *not* `nest start --watch` —
   the latter can leave the old process holding the port and silently serve stale code.
+  `-b` is what makes an edit in `packages/core/kernel` reach the running server.
+- A build error in a dependency stops the server from restarting, and it is reported in
+  the `tsc` half of the compose output, not the `app` half. Check both before assuming
+  the server is serving current code.
 - Never run `tsc --noEmit` sharing a `tsbuildinfo` with an emitting build: the second
   build sees "up to date" and emits nothing. The `typecheck` script passes
   `--incremental false` for exactly this reason.
