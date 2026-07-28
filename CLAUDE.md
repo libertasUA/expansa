@@ -6,16 +6,35 @@ Backend: Node.js + TypeScript. Mobile client: React Native (Expo).
 No browser client is in scope at launch.
 
 ## Architecture: Three-Contour Approach
-- **Contour 1 (Core Infrastructure)**: runtime, storage, job queues, auth, API skeleton.
-  Rarely changes, written carefully, heavily tested. Lives in /server core modules,
-  /packages/shared, /mobile core shell.
-- **Contour 2 (Parameterized Modules)**: building system, combat system, resource
-  production — engines configured via schemas, not hardcoded per-entity logic.
-- **Contour 3 (Product)**: actual game content — building definitions, unit stats,
-  balance tables. Mostly JSON/YAML config + domain rules, minimal code.
 
-When implementing a feature, identify which contour it belongs to and keep the
-boundary clean — Contour 2 code should never hardcode Contour 3 specifics.
+The point of the split is code volume: each contour shrinks the one above it by orders
+of magnitude, so the product itself stays small enough to hold in one head.
+
+- **Contour 1 (Core Infrastructure)**: runtime, storage, transactions, concurrency,
+  job execution, auth, observability, stable contracts and extension points. Written
+  rarely, carefully and expensively; heavily tested and profiled. Lives in /server core
+  modules, /packages/shared, /mobile core shell.
+- **Contour 2 (Parameterized Modules)**: product-independent capability engines. Each
+  represents a *family* of scenarios and is reconfigured through schemas, metadata,
+  policies and handlers — never through new branches. A Contour 2 module does not know
+  it is part of a game.
+- **Contour 3 (Product)**: the game — domain model, data schemas, business rules,
+  policies, module configuration, and a small number of genuinely unique handlers.
+  Mostly JSON/YAML config, minimal code.
+
+**The test**: if the code contains the words `building`, `unit`, `fleet`, `asteroid`
+or `clan`, it is Contour 3. Contour 2 knows only about "a timed transformation with a
+cost, prerequisites and effects"; that construction, research and ship production are
+all instances of it is a fact of Contour 3.
+
+**When to build a Contour 2 module**: only when at least three members of the family can
+be listed from `docs/domain/` without inventing them. This project has one product and
+one developer, so generalisation is paid for immediately and amortised only within this
+game — a module built for a family of one is a liability.
+
+Naming a module after a game system is the failure mode this section exists to prevent:
+a "building system" is one scenario in a folder, not an engine. The engine is a timed
+transformation; buildings are configuration.
 
 ## Tech Stack
 
