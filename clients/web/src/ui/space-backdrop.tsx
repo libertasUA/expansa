@@ -1,5 +1,7 @@
 import { type JSX, useMemo } from 'react';
 
+import { seededRandom } from '../core/random';
+
 /**
  * The view from the ark: the planet it orbits, its star, and the dark.
  *
@@ -13,9 +15,17 @@ import { type JSX, useMemo } from 'react';
  */
 interface SpaceBackdropProps {
   readonly seed?: number;
+  /**
+   * The ark view looks out at the planet it orbits. The system view has its own
+   * star and planets, so it only wants the dark and the stars behind them.
+   */
+  readonly showPlanet?: boolean;
 }
 
-export function SpaceBackdrop({ seed = 20260729 }: SpaceBackdropProps): JSX.Element {
+export function SpaceBackdrop({
+  seed = 20260729,
+  showPlanet = true,
+}: SpaceBackdropProps): JSX.Element {
   const stars = useMemo(() => generateStars(seed), [seed]);
 
   return (
@@ -92,17 +102,21 @@ export function SpaceBackdrop({ seed = 20260729 }: SpaceBackdropProps): JSX.Elem
         ))}
       </g>
 
-      {/* The star. Its position is not decoration: solar energy is the one income
-          that cannot be taken, so how close and how bright it is describes the
-          player's economy. */}
-      <circle cx="128" cy="150" r="340" fill="url(#star-glow)" />
-      <circle cx="128" cy="150" r="13" fill="#fffaf0" />
+      {showPlanet && (
+        <>
+          {/* The star. Its position is not decoration: solar energy is the one
+              income that cannot be taken, so how close and how bright it is
+              describes the player's economy. */}
+          <circle cx="128" cy="150" r="340" fill="url(#star-glow)" />
+          <circle cx="128" cy="150" r="13" fill="#fffaf0" />
 
-      {/* The planet this ark orbits, cropped by the frame so it reads as near. */}
-      <g className="planet">
-        <circle cx="700" cy="880" r="430" fill="url(#planet-lit)" />
-        <circle cx="700" cy="880" r="430" fill="url(#planet-rim)" />
-      </g>
+          {/* The planet this ark orbits, cropped by the frame so it reads near. */}
+          <g className="planet">
+            <circle cx="700" cy="880" r="430" fill="url(#planet-lit)" />
+            <circle cx="700" cy="880" r="430" fill="url(#planet-rim)" />
+          </g>
+        </>
+      )}
     </svg>
   );
 }
@@ -116,7 +130,7 @@ interface Star {
 }
 
 function generateStars(seed: number): readonly Star[] {
-  const random = mulberry32(seed);
+  const random = seededRandom(seed);
   const stars: Star[] = [];
 
   for (let index = 0; index < 260; index += 1) {
@@ -133,16 +147,4 @@ function generateStars(seed: number): readonly Star[] {
   }
 
   return stars;
-}
-
-/** mulberry32 — small, fast, and enough for scenery. */
-function mulberry32(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }

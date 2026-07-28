@@ -192,3 +192,65 @@ button:disabled {
   cursor: default;
   opacity: 0.55;
 }
+
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.system {
+  width: 100%;
+  max-height: min(85vh, 46rem);
+}
+
+.views {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.views button {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #5c6b80;
+  background: transparent;
+  border-color: rgba(90, 120, 160, 0.16);
+}
+
+.views button.active {
+  color: #c8d0dc;
+  background: rgba(21, 27, 38, 0.8);
+  border-color: #33445c;
+}
+
+.body {
+  cursor: pointer;
+}
+
+.body-label {
+  font-size: 12px;
+  fill: #6b7b92;
+  letter-spacing: 0.08em;
+}
+
+.body.home .body-label,
+.body.selected .body-label {
+  fill: #b3c2d4;
+}
+
+.body-known {
+  font-size: 11px;
+  fill: #6f9ec0;
+}
+
+/* Unknown occupancy is the normal state, so it is quiet rather than alarming —
+   the map is meant to look mostly unlit. */
+.body-unknown {
+  font-size: 11px;
+  fill: #3d4757;
+}

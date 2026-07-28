@@ -3,16 +3,18 @@ import { type JSX, useEffect, useState } from 'react';
 import { useArk } from '../core/use-ark';
 import { ArkSilhouette, type Compartment } from './ark-silhouette';
 import { SpaceBackdrop } from './space-backdrop';
+import { SystemMap, type Body } from './system-map';
 import './app.css';
 
 const ORDER_SIZE = 5;
 
 /**
- * Placeholder until the server owns compartments.
+ * Placeholders until the server owns any of this.
  *
- * Shaped like the response it will be replaced by, so wiring it up is deleting
- * this. Core level 4 so the second ring is open and the third is not — which is
- * the state worth looking at while the layout is being judged.
+ * Both are shaped like the responses that will replace them, so wiring the
+ * server up is deleting constants. Core level 4 so the second ring is open and
+ * the third is not, which is the state worth looking at while the layout is
+ * being judged.
  */
 const CORE_LEVEL = 4;
 
@@ -32,6 +34,20 @@ const COMPARTMENTS: readonly Compartment[] = Array.from({ length: 40 }, (_, inde
   OCCUPIED[index] ?? { index, module: null },
 );
 
+/**
+ * Occupancy is null everywhere except home: bodies are public astronomy, but who
+ * sits in their slots is not, and your own orbit is the one you watch for free.
+ */
+const BODIES: readonly Body[] = [
+  { id: 'i', name: 'Kerith I', kind: 'planet', orbit: 0, slots: 4, occupied: null },
+  { id: 'ii', name: 'Kerith II', kind: 'planet', orbit: 1, slots: 8, occupied: null },
+  { id: 'iii', name: 'Kerith III', kind: 'planet', orbit: 2, slots: 8, occupied: 6, home: true },
+  { id: 'belt', name: 'The Scatter', kind: 'belt', orbit: 3, slots: 0, occupied: null },
+  { id: 'iv', name: 'Kerith IV', kind: 'planet', orbit: 4, slots: 10, occupied: null },
+  { id: 'v', name: 'Kerith V', kind: 'planet', orbit: 5, slots: 6, occupied: null },
+  { id: 'vi', name: 'Kerith VI', kind: 'planet', orbit: 6, slots: 4, occupied: null },
+];
+
 const MODULE_NAMES: Readonly<Record<string, string>> = {
   core: 'Core',
   collector: 'Solar collector',
@@ -43,10 +59,14 @@ const MODULE_NAMES: Readonly<Record<string, string>> = {
   sensors: 'Sensor array',
 };
 
+type View = 'ark' | 'system';
+
 export function App(): JSX.Element {
   const { checkpoint, pending, error, busy, synthesise } = useArk();
+  const [view, setView] = useState<View>('ark');
   const [now, setNow] = useState(Date.now());
-  const [selected, setSelected] = useState<number | null>(null);
+  const [cell, setCell] = useState<number | null>(null);
+  const [body, setBody] = useState<string | null>(null);
 
   // Only drives the countdown text. The quantities themselves are projected by
   // the engine on every animation frame, not by this.
@@ -55,20 +75,49 @@ export function App(): JSX.Element {
     return () => clearInterval(timer);
   }, []);
 
+  const selectedBody = BODIES.find((candidate) => candidate.id === body) ?? null;
+
   return (
     <>
-      <SpaceBackdrop />
+      {/* Inside the ark you look out at your planet; on the map that planet is
+          one dot among several, so the scenery drops it and keeps the dark. */}
+      <SpaceBackdrop showPlanet={view === 'ark'} />
 
       <div className="scene">
-        <ArkSilhouette
-          compartments={COMPARTMENTS}
-          coreLevel={CORE_LEVEL}
-          selected={selected}
-          onSelect={(index) => setSelected(index === selected ? null : index)}
-        />
+        <div className="stage">
+          {view === 'ark' ? (
+            <ArkSilhouette
+              compartments={COMPARTMENTS}
+              coreLevel={CORE_LEVEL}
+              selected={cell}
+              onSelect={(index) => setCell(index === cell ? null : index)}
+            />
+          ) : (
+            <SystemMap
+              bodies={BODIES}
+              selected={body}
+              onSelect={(id) => setBody(id === body ? null : id)}
+            />
+          )}
+        </div>
 
         <aside className="panel">
-          <h1>Ark</h1>
+          <nav className="views">
+            <button
+              type="button"
+              className={view === 'ark' ? 'active' : ''}
+              onClick={() => setView('ark')}
+            >
+              Ark
+            </button>
+            <button
+              type="button"
+              className={view === 'system' ? 'active' : ''}
+              onClick={() => setView('system')}
+            >
+              System
+            </button>
+          </nav>
 
           {checkpoint === null ? (
             <p className="waiting">{error ?? 'Waking the ark…'}</p>
@@ -114,26 +163,39 @@ export function App(): JSX.Element {
             </>
           )}
 
-          <p className="note">
-            {selected === null ? (
-              <>
-                Core level {CORE_LEVEL}. Space is not the limit — the core is: a ring
-                stays dark until the core can carry it.
-              </>
-            ) : (
-              <>
-                Cell {selected + 1} —{' '}
-                {COMPARTMENTS[selected]?.module === undefined ||
-                COMPARTMENTS[selected]?.module === null
-                  ? 'empty'
-                  : `${MODULE_NAMES[COMPARTMENTS[selected].module] ?? ''} ${
-                      COMPARTMENTS[selected]?.level ?? 1
-                    }`}
-              </>
-            )}
-          </p>
+          {view === 'ark' ? (
+            <p className="note">
+              {cell === null
+                ? `Core level ${CORE_LEVEL}. Space is not the limit — the core is: a ring stays dark until the core can carry it.`
+                : `Cell ${cell + 1} — ${describeCell(cell)}`}
+            </p>
+          ) : (
+            <p className="note">
+              {selectedBody === null
+                ? 'Every body is on the map from the first day. Who is in orbit around them is not.'
+                : describeBody(selectedBody)}
+            </p>
+          )}
         </aside>
       </div>
     </>
   );
+}
+
+function describeCell(index: number): string {
+  const compartment = COMPARTMENTS[index];
+  if (compartment?.module == null) {
+    return 'empty';
+  }
+  return `${MODULE_NAMES[compartment.module] ?? compartment.module} ${compartment.level ?? 1}`;
+}
+
+function describeBody(selected: Body): string {
+  if (selected.kind === 'belt') {
+    return `${selected.name} — a debris field. Finite, and everyone wants it.`;
+  }
+  if (selected.occupied === null) {
+    return `${selected.name} — ${selected.slots} orbital slots. Nobody has looked; send a probe.`;
+  }
+  return `${selected.name} — ${selected.occupied} of ${selected.slots} slots taken. Your own orbit, watched for free.`;
 }
