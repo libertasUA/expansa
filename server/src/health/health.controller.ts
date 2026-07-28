@@ -1,6 +1,7 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import type { Clock } from '@expansa/kernel';
 
+import { Public } from '../auth/public.decorator';
 import { CLOCK } from '../wiring/clock.module';
 
 interface HealthResponse {
@@ -23,7 +24,11 @@ export class HealthController {
    * Unversioned on purpose. The `/v1` rule covers the game contract, which
    * clients are pinned to; this endpoint is infrastructure, read by Docker and
    * by whatever supervises the container.
+   *
+   * Public because the thing checking it holds no credentials, and a liveness
+   * probe that can fail on an auth outage restarts a healthy container.
    */
+  @Public()
   @Get()
   check(): HealthResponse {
     return {

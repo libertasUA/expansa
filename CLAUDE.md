@@ -13,10 +13,11 @@ than a third codebase. The boundaries below are built for several clients — se
 The point of the split is code volume: each contour shrinks the one above it by orders
 of magnitude, so the product itself stays small enough to hold in one head.
 
-- **Contour 1 (Core Infrastructure)**: runtime, storage, transactions, concurrency,
-  job execution, auth, observability, stable contracts and extension points. Written
-  rarely, carefully and expensively; heavily tested and profiled. Split by portability
-  into `packages/core/kernel` and `packages/core/server-runtime` — see Repository Layout.
+- **Contour 1 (Technology Stack)**: runtime, protocols, storage, security, observability,
+  performance, concurrency, infrastructure, stable contracts and extension points.
+  Written rarely, expensively, tested and profiled, reused across many products —
+  which is a description of PostgreSQL, Node and Fastify, not of our code.
+  **Mostly chosen, not written.** See Contour 1 below.
 - **Contour 2 (Parameterized Modules)**: product-independent capability engines. Each
   represents a *family* of scenarios and is reconfigured through schemas, metadata,
   policies and handlers — never through new branches. A Contour 2 module does not know
@@ -38,6 +39,50 @@ game — a module built for a family of one is a liability.
 Naming a module after a game system is the failure mode this section exists to prevent:
 a "building system" is one scenario in a folder, not an engine. The engine is a timed
 transformation; buildings are configuration.
+
+## Contour 1: chosen, not written
+
+```
+Contour 1 = adopted technology (~90%) + the seams between it (~10%)
+```
+
+The heaviest part of this contour — PostgreSQL — is not even in `node_modules`; it is a
+separate process in a separate container. The largest thing we have produced here is
+ADR 0001: an hour of discussion and almost no code. That is what "written rarely and
+expensively" looks like for one developer who adopts rather than authors.
+
+Our code belongs on the **seams**, where neither adopted piece knows about the other:
+Drizzle does not know the transaction must reach a NestJS provider; Nest does not know
+row locks must be taken in a deterministic order. Code in Contour 1 that is not on a seam
+is usually something that should have been adopted instead.
+
+Three questions before writing anything here:
+
+1. **Is it genuinely absent from the stack?** If it exists, adopt it — even when writing
+   it would be "clearer". Understanding is bought by reading documentation and choosing
+   carefully, not by reimplementing what is already profiled.
+2. **Is it a seam between two adopted things?** If not, it probably is not Contour 1.
+3. **Does it shrink Contour 2?** Removing transaction plumbing from every engine does.
+   Catching a class of bug is welcome but is not what this contour is for.
+
+**A runtime dependency is a Contour 1 decision** and carries the same weight as choosing
+the database: it is adopted infrastructure, and adopting it badly costs as much as writing
+it badly while being harder to see, because nobody reads it. Development tooling — linter,
+test runner, formatter — does not reach the running server and is not covered by this.
+
+**Marry some of it, keep the rest replaceable.** This is the real engineering judgement
+here, and it is not "abstract everything":
+
+- **PostgreSQL is married.** We use `FOR UPDATE SKIP LOCKED`, advisory locks and
+  partitioning; hiding it behind a portable abstraction would be paid for continuously
+  against a database change that will never happen.
+- **The query layer is kept at arm's length** behind repository ports, so replacing it is
+  a week rather than a rewrite.
+- **NestJS sits in between**: controllers and modules are steeped in it, use cases must
+  not know they were called over HTTP.
+
+A port is therefore not ceremony — it is how an adopted technology is owned rather than
+owning us. It belongs where a thing is replaceable, and is a liability where we married.
 
 ## Repository Layout
 
@@ -79,21 +124,43 @@ server-runtime ──────────┘
 
 ## Tech Stack
 
-Decided — see the linked ADR for reasoning, do not re-litigate without one:
-- Runtime: Node.js 24 LTS (24.18.0), TypeScript 5.9 strict — ADR 0001
-  - Server is **CommonJS** (NestJS tooling requires it); portable packages emit both
-    CommonJS and ESM so a client bundler can consume them — ADR 0003
-  - Not TypeScript 7 yet: `@nestjs/cli` still pins 5.9.x
-- Server framework: NestJS 11 on the Fastify adapter — ADR 0001
+### Platform
+
+Married, in the sense above. Changing any row is a project-level decision, not a task.
+
+| | Version | Pinned in |
+|---|---|---|
+| Node.js | 24 LTS, image `node:24-bookworm-slim` | `Dockerfile.dev`, `engines` |
+| TypeScript | 5.9.3, `strict` | `tsconfig.base.json` |
+| PostgreSQL | 18, image `postgres:18-alpine` | `docker-compose.yml` |
+| pnpm | 11.17.0 via corepack | `packageManager` |
+| Local environment | Docker Compose: Postgres + a Node container | `docker-compose.yml` |
+
+Reasons that otherwise get rediscovered the expensive way:
+
+- **Debian, not Alpine**, for the Node image: glibc versus musl matters once `node_modules`
+  is bind-mounted from an Ubuntu host.
+- **The database is published on host port 5435.** 5432-5434 belong to system-installed
+  PostgreSQL clusters on this machine, and quietly talking to the wrong database is
+  expensive to diagnose. Inside the compose network it is `postgres:5432`.
+- **PostgreSQL 18 mounts `/var/lib/postgresql`**, not `/var/lib/postgresql/data` — 18+
+  expects a version subdirectory so `pg_upgrade --link` works.
+- **Images are pinned to a major version, never `latest`.**
+- **Everything server-side runs in the container**; do not run pnpm on the host. The client
+  toolchain is the exception — a mobile one needs USB and emulators.
+- Server is **CommonJS** (NestJS tooling requires it); portable packages emit both
+  CommonJS and ESM so a client bundler can consume them — ADR 0003.
+- **Not TypeScript 7 yet**: `@nestjs/cli` still pins 5.9.x.
+
+### Decided
+
+See the linked ADR for reasoning, do not re-litigate without one:
+- Runtime and framework: NestJS 11 on the Fastify adapter — ADR 0001
 - Repository layout: contours are workspace packages, Contour 1 split by portability
   — ADR 0003
-- Database: PostgreSQL 18
-- Local development runs in Docker Compose: PostgreSQL plus a Node container that
-  hosts the server and pnpm. The client toolchain stays on the host — a mobile one
-  needs USB and emulators. Images are pinned to a major version, never `latest`.
-  - The containerised database is published on host port **5435**; 5432-5434 belong
-    to system-installed PostgreSQL clusters on the dev machine.
-  - From inside the compose network the database is `postgres:5432`.
+- Authentication is **stubbed**, and fails closed. Every route requires a principal
+  unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
+  refuses to boot. Use cases take a `Principal`, never a request or a token.
 - Time model: lazy evaluation for resources (computed on read, never ticked) plus
   deferred jobs for discrete events (construction completion, troop arrival,
   research). The intended direction, but the ADR is still in draft and unreviewed —
@@ -146,6 +213,11 @@ docker compose up -d          # postgres + server, server hot-reloads
 docker compose logs -f server
 docker compose exec server pnpm --filter @expansa/server typecheck
 curl localhost:3000/health
+
+# Authenticated endpoints: in stub mode the bearer token IS the account id,
+# so any UUID works and no sign-in flow exists yet.
+curl -H "Authorization: Bearer 3f6b1c22-9a44-4c31-8b7e-2d5a90ff1e07" \
+     localhost:3000/v1/me
 ```
 
 Notes that will otherwise cost time:
