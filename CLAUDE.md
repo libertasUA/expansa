@@ -212,7 +212,8 @@ Gaps, recorded so they stay visible:
 - **No observability.** No structured logging, request ids, query timing or lock-wait
   visibility. We chose explicit row locks and currently could not see contention if it
   happened.
-- **No CI.** Nothing runs typecheck, build or the contour-boundary check automatically.
+- **No integration tests, and so no PostgreSQL in CI.** Nothing under test touches the
+  database yet; it arrives with the first repository test.
 
 ## Clients
 
@@ -246,6 +247,7 @@ docker compose exec server pnpm test             # every project that has tests
 docker compose exec server pnpm db:migrate       # apply pending migrations
 docker compose exec server pnpm lint             # ESLint, type-aware
 docker compose exec server pnpm format           # Prettier, writes
+node tools/check-contours.mjs                    # game vocabulary in an engine
 curl localhost:3000/health
 open http://localhost:5173     # the web client
 
@@ -271,6 +273,9 @@ Notes that will otherwise cost time:
 
 ## Workflow Rules
 - Every change starts from a GitHub issue. No issue, no work.
+- A pre-commit hook formats and lints staged files and checks contour vocabulary; CI runs
+  the same checks plus typecheck, tests and the client build. Neither is something to
+  remember — the hook runs on the host, so the compose stack does not have to be up.
 - Never push directly to `main` — always a feature branch + PR.
 - Use git worktrees for parallel work: `git worktree add ../expansa-issue-N -b issue-N-description`
 - Branch naming: `issue-<number>-<short-description>`

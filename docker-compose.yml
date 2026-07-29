@@ -76,10 +76,10 @@ services:
       - pnpm-store:/home/node/.local/share/pnpm/store
     depends_on:
       - server
-    # Waits for the server's build to produce the portable packages: Vite consumes
-    # the ESM half of engines/quantity from dist, which does not exist on a fresh
-    # clone until something has run tsc.
-    command: sh -c "pnpm install && pnpm --filter @expansa/engine-quantity build && pnpm --filter @expansa/web dev"
+    # Builds the client's workspace dependencies first. Vite resolves them through
+    # their `import` condition and `tsc -b` only emits the CommonJS half, so on a
+    # fresh clone there is no ESM entry point to find. `^...` is dependencies only.
+    command: sh -c "pnpm install && pnpm --filter '@expansa/web^...' build && pnpm --filter @expansa/web dev"
 
 volumes:
   postgres-data:

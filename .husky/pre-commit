@@ -1,0 +1,12 @@
+# Formats and lints staged files only, so the hook stays fast enough not to be
+# disabled. Runs on the host rather than in the compose stack: a hook that fails
+# when the stack is down is a hook people bypass, and host and container are both
+# linux/glibc/amd64 so the same node_modules works in either — see docker-compose.yml.
+#
+# Invoked through node_modules/.bin rather than through pnpm, because a git hook
+# gets a bare PATH and pnpm arrives via corepack shims that are not on it.
+./node_modules/.bin/lint-staged
+
+# Cheap, and the one boundary check no tool provides. Kept out of lint-staged
+# because it is about the repository rather than about the files being committed.
+node tools/check-contours.mjs

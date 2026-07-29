@@ -2,7 +2,7 @@
   "name": "expansa",
   "version": "0.0.0",
   "private": true,
-  "description": "Expansa \u2014 MMO strategy game",
+  "description": "Expansa — MMO strategy game",
   "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=24.0.0"
@@ -16,7 +16,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "check:contours": "node tools/check-contours.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -24,8 +26,19 @@
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-perfectionist": "^5.10.0",
+    "globals": "^17.8.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0",
     "prettier": "^3.9.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.65.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,css,json,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }
