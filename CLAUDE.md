@@ -244,6 +244,8 @@ docker compose logs -f server
 docker compose exec server pnpm typecheck        # every project
 docker compose exec server pnpm test             # every project that has tests
 docker compose exec server pnpm db:migrate       # apply pending migrations
+docker compose exec server pnpm lint             # ESLint, type-aware
+docker compose exec server pnpm format           # Prettier, writes
 curl localhost:3000/health
 open http://localhost:5173     # the web client
 
@@ -315,6 +317,11 @@ not split yet — #42.
 
 ## Code Conventions
 
+Formatting and import order are Prettier's and ESLint's problem, not yours — run
+`pnpm format` and `pnpm lint:fix`. Nothing about whitespace, quotes or trailing commas is
+written down here on purpose: a rule someone has to remember is a rule that gets forgotten.
+
+
 - **Comments explain why, not what.** A comment restating the code is noise; one recording
   why an obvious approach was rejected is why the file is still readable in six months.
 - **No `any`.** `strict` and `noUncheckedIndexedAccess` are on. An unavoidable cast is
@@ -328,7 +335,6 @@ not split yet — #42.
   internal module is not done.
 - **Named exports only.** A default export renames itself at every import site.
 - **Files kebab-case, one exported concept each**; classes PascalCase.
-- **Import order**: Node builtins, external packages, workspace packages, relative paths.
 - **`readonly` on data interfaces.** Anything crossing a boundary — checkpoints, principals,
   engine state — is immutable, and engines return new values rather than mutating arguments.
 - **Errors carry meaning, not strings.** `kernel` throws built-in error types because it is

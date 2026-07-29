@@ -156,6 +156,9 @@ describe('timeUntilAffordable', () => {
 
 describe('unknown quantities', () => {
   it('rejects content and code disagreeing', () => {
-    assert.throws(() => engine.spend(checkpoint(), T0, { plutonium: 1 }), UnknownQuantityError);
+    assert.throws(
+      () => engine.spend(checkpoint(), T0, { plutonium: 1 }),
+      UnknownQuantityError,
+    );
   });
 });

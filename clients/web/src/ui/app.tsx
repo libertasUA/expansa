@@ -30,8 +30,9 @@ const OCCUPIED: Readonly<Record<number, Compartment>> = {
   17: { index: 17, module: 'sensors', level: 1, restoring: true },
 };
 
-const COMPARTMENTS: readonly Compartment[] = Array.from({ length: 40 }, (_, index) =>
-  OCCUPIED[index] ?? { index, module: null },
+const COMPARTMENTS: readonly Compartment[] = Array.from(
+  { length: 40 },
+  (_, index) => OCCUPIED[index] ?? { index, module: null },
 );
 
 /**
@@ -41,7 +42,16 @@ const COMPARTMENTS: readonly Compartment[] = Array.from({ length: 40 }, (_, inde
 const BODIES: readonly Body[] = [
   { id: 'i', name: 'Kerith I', kind: 'planet', orbit: 0, slots: 4, occupied: null },
   { id: 'ii', name: 'Kerith II', kind: 'planet', orbit: 1, slots: 8, occupied: null },
-  { id: 'iii', name: 'Kerith III', kind: 'planet', orbit: 2, slots: 8, occupied: 6, home: true, yourSlot: 0 },
+  {
+    id: 'iii',
+    name: 'Kerith III',
+    kind: 'planet',
+    orbit: 2,
+    slots: 8,
+    occupied: 6,
+    home: true,
+    yourSlot: 0,
+  },
   { id: 'belt', name: 'The Scatter', kind: 'belt', orbit: 3, slots: 0, occupied: null },
   { id: 'iv', name: 'Kerith IV', kind: 'planet', orbit: 4, slots: 10, occupied: null },
   { id: 'v', name: 'Kerith V', kind: 'planet', orbit: 5, slots: 6, occupied: null },
@@ -144,7 +154,11 @@ export function App(): JSX.Element {
                 ))}
               </dl>
 
-              <button type="button" onClick={() => synthesise(ORDER_SIZE)} disabled={busy}>
+              <button
+                type="button"
+                onClick={() => synthesise(ORDER_SIZE)}
+                disabled={busy}
+              >
                 Synthesise {ORDER_SIZE} fuel
               </button>
 

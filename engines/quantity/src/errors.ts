@@ -24,9 +24,7 @@ export class InsufficientQuantityError extends Error {
     readonly available: number,
     readonly required: number,
   ) {
-    super(
-      `Insufficient ${quantityId}: have ${available}, need ${required}`,
-    );
+    super(`Insufficient ${quantityId}: have ${available}, need ${required}`);
     this.name = 'InsufficientQuantityError';
   }
 }

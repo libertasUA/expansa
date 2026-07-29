@@ -1,8 +1,8 @@
 import { Logger, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
-import { AUTHENTICATOR, type Authenticator } from './authenticator';
 import { AuthGuard } from './auth.guard';
+import { AUTHENTICATOR, type Authenticator } from './authenticator';
 import { StubAuthenticator } from './stub-authenticator';
 
 /**

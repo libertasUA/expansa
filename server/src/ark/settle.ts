@@ -20,11 +20,7 @@ import type { Ark } from './ark';
  * state changes. An event that did have side effects could not be settled lazily
  * like this, because it would never fire for a player who stopped playing.
  */
-export function settleSynthesis(
-  ark: Ark,
-  at: Timestamp,
-  engine: QuantityEngine,
-): Ark {
+export function settleSynthesis(ark: Ark, at: Timestamp, engine: QuantityEngine): Ark {
   const due = ark.pending
     .filter((order) => order.completesAt <= at)
     .sort((a, b) => a.completesAt - b.completesAt);

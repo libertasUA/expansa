@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+
 import { InsufficientQuantityError, type QuantityEngine } from '@expansa/engine-quantity';
 import { addDuration, type Clock, type Principal, seconds } from '@expansa/kernel';
 

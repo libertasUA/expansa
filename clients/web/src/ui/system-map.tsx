@@ -134,9 +134,19 @@ export function SystemMap({
             >
               {/* Generous invisible target: the planets are small and this is a
                   touch screen as often as not. */}
-              <circle cx={body.x} cy={body.y} r={Math.max(body.size + 20, 30)} fill="transparent" />
+              <circle
+                cx={body.x}
+                cy={body.y}
+                r={Math.max(body.size + 20, 30)}
+                fill="transparent"
+              />
 
-              <circle cx={body.x} cy={body.y} r={body.size} fill={`url(#body-${body.id})`} />
+              <circle
+                cx={body.x}
+                cy={body.y}
+                r={body.size}
+                fill={`url(#body-${body.id})`}
+              />
 
               {/* One mark per orbital slot. How many there are is public
                   astronomy; who is in them is not, so an unobserved planet shows
