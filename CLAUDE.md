@@ -243,6 +243,7 @@ docker compose up -d          # postgres, server, web — all hot-reload
 docker compose logs -f server
 docker compose exec server pnpm typecheck        # every project
 docker compose exec server pnpm test             # every project that has tests
+docker compose exec server pnpm db:migrate       # apply pending migrations
 curl localhost:3000/health
 open http://localhost:5173     # the web client
 

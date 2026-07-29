@@ -4,8 +4,8 @@ Adapters over adopted technology, and the machinery those adapters share. The ro
 `CLAUDE.md` is already loaded; this file adds only what applies to writing code *here*
 and is not repeated there.
 
-The package does not exist as code yet — it arrives with #13, and these are the rules it
-arrives under.
+So far it holds the migration runner and the `platform` schema declaration. The rest —
+pool, transactions, adapters — arrives with #13.
 
 ## The contour is chosen, not written
 
@@ -82,8 +82,12 @@ Two PostgreSQL schemas. This package declares and owns `platform.*` only —
 `accounts`, `identities`, `entitlements`, `receipts`, `push_tokens`. Game tables are
 declared in `server` — #13.
 
-Migrations are a single ordered history at the repository root, because ordering crosses
-schemas and there is one database. Definitions are split by owner; migrations are not.
+Migrations are a single ordered history in `/migrations`, because ordering crosses schemas
+and there is one database. Definitions are split by owner; migrations are not.
+
+Generate with `pnpm db:generate`, apply with `pnpm db:migrate`. Drizzle's own bookkeeping
+lives in a `drizzle` schema so that `public` stays empty and nothing lands there by
+accident.
 
 ## Settled, awaiting ADR (#13)
 
