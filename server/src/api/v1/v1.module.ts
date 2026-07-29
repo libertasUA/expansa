@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { ArkModule } from '../../ark/ark.module';
+import { AuthModule } from '../../auth/auth.module';
 import { ArkController } from './ark.controller';
+import { AuthController } from './auth.controller';
 import { MeController } from './me.controller';
 
 /**
@@ -10,7 +12,7 @@ import { MeController } from './me.controller';
  * clients in app stores update over weeks and the old ones keep calling.
  */
 @Module({
-  imports: [ArkModule],
-  controllers: [MeController, ArkController],
+  imports: [ArkModule, AuthModule],
+  controllers: [MeController, ArkController, AuthController],
 })
 export class V1Module {}

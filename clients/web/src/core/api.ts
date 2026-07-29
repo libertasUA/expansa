@@ -1,6 +1,8 @@
 import type { Checkpoint } from '@expansa/engine-quantity';
 import { timestamp } from '@expansa/kernel';
 
+import { clearSession, currentToken } from './session';
+
 export interface PendingSynthesis {
   readonly id: string;
   readonly fuel: number;
@@ -20,22 +22,24 @@ interface ArkResponse {
 
 export class ApiError extends Error {}
 
-/**
- * Authentication is stubbed server-side, so the bearer token is simply an account
- * id and there is no sign-in flow to build yet. Kept in one place so that the day
- * real tokens arrive, only this file learns about it.
- */
-const ACCOUNT_ID = '3f6b1c22-9a44-4c31-8b7e-2d5a90ff1e07';
-
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = currentToken();
+
   const response = await fetch(`/v1${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${ACCOUNT_ID}`,
+      ...(token === null ? {} : { Authorization: `Bearer ${token}` }),
       ...init?.headers,
     },
   });
+
+  // A token the server will not honour is a token worth forgetting: expired,
+  // revoked, or left over from a database that has since been reset. Clearing it
+  // here means every caller gets sent back to sign-in without knowing about it.
+  if (response.status === 401) {
+    clearSession();
+  }
 
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
