@@ -241,6 +241,9 @@ Reasons that otherwise get rediscovered the expensive way:
   loop: no emulator, no store review, and a Steam build would be this client in a desktop
   shell anyway. Mobile stays possible; `src/core` and `src/ui` are split from the first
   commit so the shared half can be extracted when a second client appears.
+- Time model: quantities are computed from a checkpoint, never credited by a tick;
+  discrete events are scheduled — ADR 0002. **A rate may never depend on an amount**, and
+  a new mechanic that would break that gets reformulated rather than the model propped up.
 - Authentication is **stubbed**, and fails closed. Every route requires a principal
   unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
   refuses to boot. Use cases take a `Principal`, never a request or a token.
@@ -267,9 +270,6 @@ Do not assume an answer; ask before writing code that depends on it.
   inside the same transaction as the state change that caused it
 - Event ordering for simultaneous events on one base
 - Client-server contract details and the server-push channel
-- Time model: lazy evaluation for resources plus deferred jobs for discrete events is the
-  intended direction, but ADR 0002 is still a draft and is blocked on domain questions —
-  the resource set, warehouse overflow, and upkeep deficit
 
 ### Not chosen at all
 
