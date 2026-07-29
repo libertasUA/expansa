@@ -408,15 +408,12 @@ Procedural generation is also consistent with the determinism already chosen for
   worse and therefore not a choice at all.
 - **Where a newcomer's ark arrives** — near other newcomers and away from developed
   players, but the rule needs stating before the map generator exists.
-- **Resource set.** Leading answer, three: **energy** (from nothing, passive), **fuel**
-  (synthesised from energy, buys reach), **material** (extracted outside, or synthesised at
-  a punitive rate). A fourth, rare and asteroid-only, is likely later so that asteroids are
-  worth a separate fight. Still to confirm before the quantity engine is written.
-- **Warehouse overflow** — is the excess lost, or does production stop? Blocks the time
-  model ADR.
-- **Upkeep and deficit** — what happens when consumption exceeds production, and whether
-  desertion exists at all. Blocks the time model ADR, because losing units one at a time
-  produces an event whose time must be recomputed on every change to production or fleet.
+- **A fourth, rare resource**, extracted only from asteroids, so that asteroids are worth
+  a fight of their own. Likely, not settled.
+- **How an asteroid depletes.** Modelled as a falling rate, its exhaustion moment moves
+  every time a complex is added or destroyed — the one shape ADR 0002 forbids. The
+  intended answer is that a deposit drops in steps when a convoy departs with its load,
+  but it needs settling before extraction complexes exist.
 - **Session shape** — what a player does in a two-minute session on a phone.
 - **Target player** — someone who sets alarms at 3 a.m., or someone with a few minutes a
   day. This decides whether offline protection and push notifications are core mechanics.
@@ -449,3 +446,8 @@ Procedural generation is also consistent with the determinism already chosen for
   still assumes a phone-shaped audience — short sessions, no 3 a.m. alarms — which is a
   statement about players rather than about the platform.
 - One world at launch, `world_id` in the schema from day one.
+- Three resources: **energy** (accrues from nothing), **fuel** (synthesised, buys reach),
+  **material** (extracted outside, or synthesised at a punitive rate).
+- A full store loses the excess; production does not halt. Fleet size is capped by shipyard
+  berths rather than by upkeep, so nothing starves and desertion does not exist. Both
+  choices exist to keep any rate from depending on an amount — ADR 0002.
