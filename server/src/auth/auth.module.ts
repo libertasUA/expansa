@@ -1,11 +1,13 @@
 import { Logger, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
-import { ACCOUNT_REPOSITORY } from './account';
+import { DrizzleAccountRepository, type Database } from '@expansa/platform';
+
+import { DATABASE, DatabaseModule } from '../wiring/database.module';
+import { ACCOUNT_REPOSITORY } from './account-repository.token';
 import { AuthGuard } from './auth.guard';
 import { AUTHENTICATOR, type Authenticator } from './authenticator';
 import { CredentialsUseCase } from './credentials.use-case';
-import { InMemoryAccountRepository } from './in-memory-account.repository';
 import { StubAuthenticator } from './stub-authenticator';
 
 /**
@@ -51,11 +53,16 @@ function selectAuthenticator(): Authenticator {
 }
 
 @Module({
+  imports: [DatabaseModule],
   providers: [
     { provide: AUTHENTICATOR, useFactory: selectAuthenticator },
     // Global, so routes are protected unless they opt out with @Public().
     { provide: APP_GUARD, useClass: AuthGuard },
-    { provide: ACCOUNT_REPOSITORY, useClass: InMemoryAccountRepository },
+    {
+      provide: ACCOUNT_REPOSITORY,
+      inject: [DATABASE],
+      useFactory: (db: Database) => new DrizzleAccountRepository(db),
+    },
     CredentialsUseCase,
   ],
   exports: [AUTHENTICATOR, CredentialsUseCase],

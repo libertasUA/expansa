@@ -9,9 +9,17 @@ import {
 } from '@nestjs/common';
 
 import { accountId, type Principal } from '@expansa/kernel';
+import type { AccountRepository } from '@expansa/platform';
 
-import { ACCOUNT_REPOSITORY, type Account, type AccountRepository } from './account';
+import { ACCOUNT_REPOSITORY } from './account-repository.token';
 import { hashPassword, verifyPassword } from './password';
+
+/**
+ * A login and a password is one identity provider among the several to come —
+ * Apple, Google, Steam. Naming it here rather than inlining the string is what
+ * makes adding one an insert rather than a schema change.
+ */
+const PASSWORD = 'password';
 
 const MIN_LOGIN = 3;
 const MIN_PASSWORD = 8;
@@ -30,37 +38,38 @@ export class CredentialsUseCase {
   async register(login: string, password: string): Promise<Principal> {
     assertCredentials(login, password);
 
-    if ((await this.accounts.findByLogin(login)) !== null) {
+    if ((await this.accounts.findByIdentity(PASSWORD, login)) !== null) {
       throw new ConflictException('That login is taken');
     }
 
-    const account: Account = {
-      id: accountId(randomUUID()),
-      login,
-      passwordHash: await hashPassword(password),
-    };
-    await this.accounts.create(account);
+    const id = accountId(randomUUID());
+    await this.accounts.createWithIdentity({
+      accountId: id,
+      provider: PASSWORD,
+      externalId: login,
+      secret: await hashPassword(password),
+    });
 
-    return { accountId: account.id };
+    return { accountId: id };
   }
 
   async signIn(login: string, password: string): Promise<Principal> {
     assertCredentials(login, password);
 
-    const account = await this.accounts.findByLogin(login);
+    const identity = await this.accounts.findByIdentity(PASSWORD, login);
 
     // Hash even when the login is unknown, so that a missing account and a wrong
     // password take the same time. Otherwise the response time enumerates logins.
-    const matches =
-      account === null
-        ? await verifyPassword(password, await hashPassword(password))
-        : await verifyPassword(password, account.passwordHash);
+    const matches = await verifyPassword(
+      password,
+      identity?.secret ?? (await hashPassword(password)),
+    );
 
-    if (account === null || !matches) {
+    if (identity === null || !matches) {
       throw new UnauthorizedException('Wrong login or password');
     }
 
-    return { accountId: account.id };
+    return { accountId: accountId(identity.accountId) };
   }
 }
 
