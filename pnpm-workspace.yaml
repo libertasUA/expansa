@@ -20,3 +20,4 @@ packages:
 # without its native binary. Anything added below is a deliberate exception.
 allowBuilds:
   esbuild: true
+  unrs-resolver: set this to true or false

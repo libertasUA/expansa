@@ -100,9 +100,30 @@ export function ArkSilhouette({
       </defs>
 
       {/* Outer hull: the rim that holds the whole disc together. */}
-      <circle cx={CENTRE} cy={CENTRE} r="382" fill="none" stroke="#111925" strokeWidth="30" />
-      <circle cx={CENTRE} cy={CENTRE} r="382" fill="none" stroke="#26313f" strokeWidth="1.4" />
-      <circle cx={CENTRE} cy={CENTRE} r="366" fill="none" stroke="#1a232f" strokeWidth="1" />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r="382"
+        fill="none"
+        stroke="#111925"
+        strokeWidth="30"
+      />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r="382"
+        fill="none"
+        stroke="#26313f"
+        strokeWidth="1.4"
+      />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r="366"
+        fill="none"
+        stroke="#1a232f"
+        strokeWidth="1"
+      />
 
       {/* Docking pylons, evenly spaced around the rim. */}
       {Array.from({ length: 8 }, (_, index) => {
@@ -112,7 +133,14 @@ export function ArkSilhouette({
         return (
           <g key={`pylon-${index}`}>
             <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="#232f3f" strokeWidth="7" />
-            <circle cx={x1} cy={y1} r="6" fill="#0c121b" stroke="#2c3a4c" strokeWidth="1.2" />
+            <circle
+              cx={x1}
+              cy={y1}
+              r="6"
+              fill="#0c121b"
+              stroke="#2c3a4c"
+              strokeWidth="1.2"
+            />
           </g>
         );
       })}
@@ -171,7 +199,10 @@ export function ArkSilhouette({
                   />
 
                   {light !== null && (
-                    <g filter="url(#lamp)" opacity={compartment?.restoring === true ? 0.5 : 1}>
+                    <g
+                      filter="url(#lamp)"
+                      opacity={compartment?.restoring === true ? 0.5 : 1}
+                    >
                       <path d={path} fill={light} opacity="0.16" />
                       <path
                         d={arc(ring.outer - 7, start + pad, end - pad)}
@@ -209,16 +240,46 @@ export function ArkSilhouette({
         stroke="#3a4a5e"
         strokeWidth="1.6"
       />
-      <circle cx={CENTRE} cy={CENTRE} r={CORE_RADIUS - 14} fill="none" stroke="#243040" strokeWidth="1" />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r={CORE_RADIUS - 14}
+        fill="none"
+        stroke="#243040"
+        strokeWidth="1"
+      />
 
       {Array.from({ length: Math.min(coreLevel, 10) }, (_, index) => {
         const angle = (index / 10) * Math.PI * 2 - Math.PI / 2;
         const [x, y] = polar(CORE_RADIUS - 26, angle);
-        return <circle key={`pip-${index}`} cx={x} cy={y} r="4.5" fill="#e8d5a0" opacity="0.8" />;
+        return (
+          <circle
+            key={`pip-${index}`}
+            cx={x}
+            cy={y}
+            r="4.5"
+            fill="#e8d5a0"
+            opacity="0.8"
+          />
+        );
       })}
 
-      <circle cx={CENTRE} cy={CENTRE} r="34" fill="#0b111a" stroke="#4a5c73" strokeWidth="1.2" />
-      <circle cx={CENTRE} cy={CENTRE} r="18" fill="#e8d5a0" opacity="0.9" filter="url(#lamp)" />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r="34"
+        fill="#0b111a"
+        stroke="#4a5c73"
+        strokeWidth="1.2"
+      />
+      <circle
+        cx={CENTRE}
+        cy={CENTRE}
+        r="18"
+        fill="#e8d5a0"
+        opacity="0.9"
+        filter="url(#lamp)"
+      />
     </svg>
   );
 }

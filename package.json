@@ -12,10 +12,20 @@
     "typecheck": "tsc -b --force",
     "test": "pnpm -r test",
     "db:migrate": "pnpm --filter @expansa/platform migrate",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "drizzle-kit": "^0.31.6",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-perfectionist": "^5.10.0",
+    "prettier": "^3.9.6",
     "typescript": "^5.9.3",
-    "drizzle-kit": "^0.31.6"
+    "typescript-eslint": "^8.65.0"
   }
 }

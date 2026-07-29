@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
+
 import type { Principal } from '@expansa/kernel';
 
 import { AUTHENTICATOR, type Authenticator } from './authenticator';

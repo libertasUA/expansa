@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { type QuantityEngine, createQuantityEngine } from '@expansa/engine-quantity';
 
 import { QUANTITIES } from '../content/quantities';

@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+
 import type { Principal } from '@expansa/kernel';
 
 import { CurrentPrincipal } from '../../auth/current-principal.decorator';

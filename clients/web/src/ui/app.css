@@ -1,6 +1,6 @@
 :root {
   color-scheme: dark;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   background: #05070d;
   color: #c8d0dc;
 }
@@ -175,7 +175,9 @@ button:disabled {
 }
 
 .cell path:first-of-type {
-  transition: stroke 120ms ease, fill 120ms ease;
+  transition:
+    stroke 120ms ease,
+    fill 120ms ease;
 }
 
 .cell:hover path:first-of-type {

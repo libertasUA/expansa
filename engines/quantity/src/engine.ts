@@ -94,11 +94,7 @@ export function createQuantityEngine(
    * mutation has to happen at a known instant, and leaving that to the caller is
    * how resources quietly go missing.
    */
-  function spend(
-    checkpoint: Checkpoint,
-    at: Timestamp,
-    cost: QuantityDelta,
-  ): Checkpoint {
+  function spend(checkpoint: Checkpoint, at: Timestamp, cost: QuantityDelta): Checkpoint {
     const current = project(checkpoint, at);
     const states = { ...current.states };
 

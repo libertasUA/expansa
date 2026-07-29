@@ -1,4 +1,5 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
+
 import type { Principal } from '@expansa/kernel';
 
 import { PRINCIPAL_KEY, type RequestWithPrincipal } from './auth.guard';
