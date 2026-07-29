@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import perfectionist from 'eslint-plugin-perfectionist';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 /**
@@ -118,8 +119,18 @@ export default tseslint.config(
   },
 
   {
+    // Build and tooling scripts sit outside any tsconfig, so type-aware rules have
+    // nothing to work from.
     files: ['**/*.js', '**/*.mjs', 'drizzle.config.ts'],
     ...tseslint.configs.disableTypeChecked,
+  },
+
+  {
+    // Separate object on purpose: disableTypeChecked carries its own
+    // languageOptions, and spreading it over these would drop the globals with no
+    // sign that anything had happened.
+    files: ['**/*.js', '**/*.mjs'],
+    languageOptions: { globals: globals.nodeBuiltin },
   },
 
   prettier,

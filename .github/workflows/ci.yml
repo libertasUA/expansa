@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A second push to the same branch makes the first run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        # Version comes from packageManager in package.json, so there is one place
+        # to change it and corepack and CI cannot disagree.
+
+      - uses: actions/setup-node@v6
+        with:
+          # Must match Dockerfile.dev. Nothing enforces that, so it is the one
+          # duplicated fact here worth checking by hand when the image moves.
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Ordered cheapest first: a formatting slip should not wait behind a full
+      # type-check to be reported.
+      - run: pnpm format:check
+      - run: pnpm lint
+
+      # `tsc -b --force` across every project. This is also the build — the
+      # project-reference graph compiles each package in dependency order, so a
+      # separate build step would repeat it.
+      - run: pnpm typecheck
+
+      - run: pnpm test
+
+      # The layer pnpm and TypeScript cannot provide: an engine that has learned
+      # what a building is still compiles.
+      - run: node tools/check-contours.mjs
+
+      # The client is bundled rather than compiled by tsc -b, so its build is
+      # checked separately — and `...` builds its workspace dependencies first.
+      # Vite resolves the portable packages through their `import` condition, and
+      # `tsc -b` only produces the CommonJS half; without this the client cannot
+      # find an entry point on a clean checkout.
+      - run: pnpm --filter "@expansa/web..." build
+
+# PostgreSQL is deliberately absent: nothing under test touches it yet. It arrives
+# with the first repository test, and the compose file is the definition to copy.
