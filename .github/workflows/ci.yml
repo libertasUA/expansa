@@ -1,8 +1,9 @@
 name: CI
 
 on:
+  # Any base, not just main: a pull request stacked on another branch would
+  # otherwise get no CI at all, and silence is not a signal.
   pull_request:
-    branches: [main]
   push:
     branches: [main]
 
@@ -16,6 +17,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Three pull requests have been lost by branching from whatever was checked
+      # out: each merged into a parent that had already been squash-merged, so the
+      # content never reached main. Nothing else notices until the work is gone.
+      - name: Refuse a stacked pull request
+        if: github.event_name == 'pull_request' && github.base_ref != 'main'
+        run: |
+          echo "::error::This pull request targets '${{ github.base_ref }}', not 'main'."
+          echo "Squash merges discard a child merged into a parent afterwards."
+          echo "Rebase onto main:  git rebase --onto origin/main <parent-branch>"
+          exit 1
+
       - uses: actions/checkout@v5
 
       - uses: pnpm/action-setup@v4

@@ -2,7 +2,7 @@
   "name": "expansa",
   "version": "0.0.0",
   "private": true,
-  "description": "Expansa — MMO strategy game",
+  "description": "Expansa \u2014 MMO strategy game",
   "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=24.0.0"
@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "check:contours": "node tools/check-contours.mjs"
+    "check:contours": "node tools/check-contours.mjs",
+    "branch": "sh tools/branch.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
