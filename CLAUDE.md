@@ -71,15 +71,17 @@ test runner, formatter — does not reach the running server and is not covered 
 - **The query layer is kept at arm's length** behind repository ports, so replacing it is
   a week rather than a rewrite.
 - **NestJS sits in between**: controllers and modules are steeped in it, use cases must
-  not know they were called over HTTP.
+  not know they were called over HTTP. Anything outside `server` enters the framework as a
+  value through `useFactory`, never as a class Nest instantiates — ADR 0005.
 
 A port is therefore not ceremony — it is how an adopted technology is owned rather than
 owning us. It belongs where a thing is replaceable, and is a liability where we married.
 
 ## Contour 2: half bought, half written
 
-**Bought (2a).** Every horizontal capability. Their seams need no new directory: the
-contract goes to `kernel`, the adapter to `platform`, the product decision to `server`.
+**Bought (2a).** Every horizontal capability. The library needs no directory; everything
+around it does — port in `kernel`, adapter in `platform`, binding in `server`,
+configuration in `content`. See ADR 0005.
 
 | Capability | Adopt |
 |---|---|
@@ -105,6 +107,12 @@ not happen — and that is visible immediately rather than in six months.
 **When to build one**: only when at least three members of the family can be listed from
 `docs/domain/` **without inventing them**. One product and one developer means
 generalisation is paid for immediately and amortised only within this game.
+
+That threshold applies **only to what we write**. A horizontal capability is asked a
+different question first — *does something adoptable already exist?* — and if it does,
+writing our own is not allowed. Linking four identity providers to one account is for
+sale; a timed transformation covering construction, research and ship production is not.
+ADR 0005.
 
 ### What an engine is
 
