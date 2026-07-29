@@ -42,112 +42,44 @@ transformation; buildings are configuration.
 Contour 1 = adopted technology (~90%) + the seams between it (~10%)
 ```
 
-Its heaviest part — PostgreSQL — is not even in `node_modules`; it is a separate process
-in a separate container. Our code belongs on the **seams**, where neither adopted piece
-knows about the other: Drizzle does not know the transaction must reach a NestJS provider;
-Nest does not know row locks must be taken in a deterministic order. Code here that is not
-on a seam is usually something that should have been adopted instead.
+Its heaviest part — PostgreSQL — is not even in `node_modules`; it is a separate process in
+a separate container. Our code belongs on the **seams**, where neither adopted piece knows
+about the other. Code here that is not on a seam is usually something that should have been
+adopted instead.
 
-Three questions before writing anything in this contour:
+Two rules that reach beyond this contour and so live here rather than in `platform/`:
 
-1. **Is it genuinely absent from the stack?** If it exists, adopt it — even when writing
-   it would be "clearer". Understanding is bought by reading documentation and choosing
-   carefully, not by reimplementing what is already profiled.
-2. **Is it a seam between two adopted things?** If not, it probably is not Contour 1.
-3. **Does it shrink Contour 2?** Removing transaction plumbing from every engine does.
-   Catching a class of bug is welcome but is not what this contour is for.
+- **A runtime dependency is a Contour 1 decision**, carrying the same weight as choosing the
+  database — adopting badly costs as much as writing badly and is harder to see, because
+  nobody reads it. Development tooling is not covered.
+- **We married PostgreSQL and keep the query layer replaceable.** A port is how an adopted
+  technology is owned rather than owning us; it belongs where a thing is replaceable and is
+  a liability where we married.
 
-**A runtime dependency is a Contour 1 decision** and carries the same weight as choosing
-the database: it is adopted infrastructure, and adopting it badly costs as much as writing
-it badly while being harder to see, because nobody reads it. Development tooling — linter,
-test runner, formatter — does not reach the running server and is not covered by this.
-
-**Marry some of it, keep the rest replaceable.** The real judgement here, and it is not
-"abstract everything":
-
-- **PostgreSQL is married.** We use `FOR UPDATE SKIP LOCKED`, advisory locks and
-  partitioning; hiding it behind a portable abstraction would be paid for continuously
-  against a database change that will never happen.
-- **The query layer is kept at arm's length** behind repository ports, so replacing it is
-  a week rather than a rewrite.
-- **NestJS sits in between**: controllers and modules are steeped in it, use cases must
-  not know they were called over HTTP. Anything outside `server` enters the framework as a
-  value through `useFactory`, never as a class Nest instantiates — ADR 0005.
-
-A port is therefore not ceremony — it is how an adopted technology is owned rather than
-owning us. It belongs where a thing is replaceable, and is a liability where we married.
+**Writing in `kernel` or `platform`: read `platform/CLAUDE.md` first.** It holds the three
+questions to ask before adding anything, what may not be abstracted, and why there is no
+`@nestjs` dependency there.
 
 ## Contour 2: half bought, half written
 
-**Bought (2a).** Every horizontal capability. The library needs no directory; everything
-around it does — port in `kernel`, adapter in `platform`, binding in `server`,
-configuration in `content`. See ADR 0005.
-
-| Capability | Adopt |
-|---|---|
-| Authentication | provider SDKs — Apple, Google, Steam |
-| Payments | RevenueCat for stores, Stripe for web, Steam MTX |
-| Notifications | Expo Push / FCM / APNs |
-| Roles and permissions | Casbin or equivalent, for clan roles |
-| Analytics | PostHog |
-
-Only the normalisation is ours: three stores with incompatible receipts, one entitlement.
+**Bought (2a).** Every horizontal capability — authentication, payments, notifications,
+roles, analytics. If something adoptable exists, writing our own is not allowed. The
+library needs no directory; everything around it does — port in `kernel`, adapter in
+`platform`, binding in `server`, configuration in `content`. ADR 0005.
 
 **Written (2b).** The family engines: projected quantities, timed transformations, modifier
-stacks, deterministic resolution, visibility. No one sells these.
+stacks, deterministic resolution, visibility. Nobody sells these.
 
-### The acceptance criterion for an engine
+The one rule that reaches outside the package, because it constrains product work too:
 
 > **Adding a Contour 3 entity must cost zero lines of code.**
 
-A new building, resource or ship is a YAML entry. A new *kind of mechanic* is engine work,
-and that is legitimate. If adding a building requires touching TypeScript, the engine did
-not happen — and that is visible immediately rather than in six months.
+A new resource, building or ship is a content entry. If it requires touching TypeScript,
+the engine did not happen.
 
-**When to build one**: only when at least three members of the family can be listed from
-`docs/domain/` **without inventing them**. One product and one developer means
-generalisation is paid for immediately and amortised only within this game.
-
-That threshold applies **only to what we write**. A horizontal capability is asked a
-different question first — *does something adoptable already exist?* — and if it does,
-writing our own is not allowed. Linking four identity providers to one account is for
-sale; a timed transformation covering construction, research and ship production is not.
-ADR 0005.
-
-### What an engine is
-
-A set of functions built from configuration, not a class that imports content:
-
-```ts
-const quantities = createQuantityEngine(definitions);
-quantities.project(checkpoint, at);
-```
-
-Three properties, each buying something specific:
-
-| Property | What it buys |
-|---|---|
-| Config arrives as an argument, never by import | a new entity costs no code |
-| All state arrives as arguments — no hidden reads | testable without a database |
-| No clock and no randomness; the instant and the seed are parameters | a battle report can be replayed months later |
-
-Purity is a property most engines have, **not the definition**. A pure function handling
-one specific case is a handler, not an engine. The question is always: *is this the same
-mechanism applied to many things?*
-
-### Config or handler
-
-Configuration expresses **what**; a handler expresses **how**, when the how is genuinely
-unique, and is invoked by name from content.
-
-Both extremes fail. All-config invents a programming language with no debugger and no
-types. A handler per entity puts Contour 3 back to writing code for every building.
-
-> **The smell: a condition appearing in config means a handler was needed.**
-
-An upgrade cost is a formula in config — every building has one of the same shape. "A clan
-outpost grants entry to a sector when built" is a handler — expressing it as data would
-drag the concept of sector access into the schema.
+**Writing an engine: read `engines/CLAUDE.md` first.** It holds the threshold for building
+one at all, the config-versus-handler boundary, and the time invariant from ADR 0002 that
+decides what an engine may model.
 
 ## Repository Layout
 
@@ -256,17 +188,9 @@ Reasons that otherwise get rediscovered the expensive way:
   unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
   refuses to boot. Use cases take a `Principal`, never a request or a token.
 
-Decided in discussion, **ADR pending** (#13) — treat as settled, but the reasoning is not
-yet written down:
-
-- **Drizzle ORM** with `drizzle-kit` for migrations, chosen over Kysely. Known gap:
-  `CREATE INDEX CONCURRENTLY` cannot run inside the transaction the migrator wraps.
-- **READ COMMITTED with explicit row locks.** Every use case locks its aggregate root with
-  `FOR UPDATE` first, and multi-root operations lock in a deterministic order. Retries
-  exist for deadlock, not as the normal path.
-- **Transactions propagate through `AsyncLocalStorage`**, adopting `@nestjs-cls/transactional`
-  rather than hand-rolling it. Ours is only what it does not do: lock ordering, deadlock
-  retry, and the mandatory resource catch-up.
+Persistence is settled in discussion and awaiting its ADR (#13): Drizzle, READ COMMITTED
+with explicit row locks, transactions through `AsyncLocalStorage`. The detail lives in
+`platform/CLAUDE.md`, since nothing outside that package acts on it.
 
 ### Still open
 
@@ -295,28 +219,21 @@ Gaps, recorded so they stay visible:
 ## Clients
 
 One client will be written; the architecture assumes there will be more. Almost nothing on
-the server depends on which comes first — only three adapters do: push transport, payment
-provider, and session storage. So the choice stays open, and these rules keep it open:
+the server depends on which comes first — only push transport, payment provider and session
+storage do, and all three are adapters at the edge.
 
-1. **The server never knows which client is talking to it.** No branching on platform. A
-   client that needs different behaviour declares its own capabilities; the server does
-   not infer them from a User-Agent.
-2. **A client directory holds rendering and platform APIs, nothing else.** Transport,
-   session, local store, cached state, and view models are not rendering. Inside the first
-   client keep them split as `src/core/` and `src/ui/`, so extracting a shared client
-   package later is a file move rather than a rewrite.
-3. **The contract is versioned (`/v1`) and changes additively.** Fields may be added;
-   removing one or changing its meaning requires a new version. This is not optional
-   politeness: a mobile client updates over weeks, so the server must serve several
-   contract versions at once. `/health` is exempt — it is infrastructure read by Docker,
-   not contract a client pins to.
+Two rules belong here because the *server* has to honour them:
 
-A shared client package is deliberately **not** created up front — a family of zero cannot
-be designed for. It gets extracted when the second client appears.
+- **The server never knows which client is talking to it.** No branching on platform.
+- **The contract is versioned (`/v1`) and changes additively.** A mobile client updates over
+  weeks, so several contract versions are served at once. `/health` is exempt.
 
 One consequence lands in the schema before any client exists and is expensive to retrofit:
-**accounts, not users.** `accounts` plus `identities(provider, external_id)`. One player
-may arrive through Apple, Google, Steam, or email and must be one account.
+**accounts, not users.** `accounts` plus `identities(provider, external_id)`, because one
+player may arrive through Apple, Google, Steam or email and must be one account.
+
+**Working in a client: read `clients/CLAUDE.md` first.** It holds the `core`/`ui` split,
+projecting against server time, and what the map is allowed to display.
 
 ## Local Development
 
@@ -370,6 +287,27 @@ Notes that will otherwise cost time:
   /docs/adr/, sequentially numbered, never edited after merge (superseded by new ADR instead)
 - Business logic changes → update the relevant /docs/domain/<feature>.md
 - Don't document trivial refactors or bug fixes — keep signal high
+
+### Where a rule goes
+
+This file is loaded at the start of every session; a package's `CLAUDE.md` is loaded only
+when work happens there. So the split is not cosmetic — it decides what every task pays for.
+
+| | |
+|---|---|
+| **Here** | how to place a thing, how to work, and any rule another package must honour |
+| **`<package>/CLAUDE.md`** | how to write code *in that package* |
+
+Rule of thumb: **this file states, a package elaborates.** The acceptance criterion for an
+engine is here because product work depends on it; that ids are strings rather than unions
+is in `engines/`, because only an engine author can get that wrong.
+
+> **No rule may appear in two files.** A duplicated rule is one that gets edited in one
+> place and goes stale in the other. A package file may *reference* a rule stated here — it
+> may not restate it.
+
+Existing package files: `platform/`, `engines/`, `clients/`. `kernel/` and `server/` are
+not split yet — #42.
 
 ## Code Conventions
 
