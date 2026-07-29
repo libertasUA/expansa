@@ -10,9 +10,12 @@
   "scripts": {
     "build": "tsc -b",
     "typecheck": "tsc -b --force",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "db:migrate": "pnpm --filter @expansa/platform migrate",
+    "db:generate": "drizzle-kit generate"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "drizzle-kit": "^0.31.6"
   }
 }

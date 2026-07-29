@@ -11,12 +11,12 @@ packages:
   - content
   - server
   - clients/*
-allowBuilds:
-  esbuild: set this to true or false
 
-# pnpm blocks postinstall scripts by default, which is the right default — a
-# dependency running arbitrary code at install time is how supply-chain attacks
-# land. esbuild is allowed because Vite cannot start without its native binary.
-# Anything added here is a deliberate exception, not a convenience.
-onlyBuiltDependencies:
-  - esbuild
+# pnpm blocks dependency install scripts by default, which is the right default —
+# a package running arbitrary code at install time is how supply-chain attacks
+# land, and pnpm makes each exception explicit rather than silent.
+#
+# esbuild is allowed because Vite and drizzle-kit both ship it and neither runs
+# without its native binary. Anything added below is a deliberate exception.
+allowBuilds:
+  esbuild: true

@@ -9,6 +9,7 @@
   "files": [],
   "references": [
     { "path": "./kernel" },
+    { "path": "./platform" },
     { "path": "./engines/quantity" },
     { "path": "./server" }
   ]
