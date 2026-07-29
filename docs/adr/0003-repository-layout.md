@@ -1,7 +1,16 @@
 # ADR 0003 — Repository Layout and Contour Boundaries
 
-- **Status**: Accepted
+- **Status**: Partially superseded by ADR 0004
 - **Date**: 2026-07-28
+
+> **Read ADR 0004 first.** It replaced the physical layout and the package naming below:
+> packages live at the repository root rather than under `packages/`, `server-runtime` is
+> now `platform`, `server/src/domain` is now `server/src/handlers`, and a portable engine
+> owns no storage at all — which corrects this document rather than extending it.
+>
+> What still stands here, and is not restated in 0004: the dependency rules between
+> packages, the split of Contour 1 by portability, the dual CommonJS/ESM build, and the
+> project-reference graph.
 
 ## Context
 

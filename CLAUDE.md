@@ -115,14 +115,12 @@ server/src/
 └── jobs/        event handlers — transport only, zero logic
 ```
 
-`api/` and `jobs/` are twins and equally empty: the same use case must be reachable from
-both, which is the check that logic is genuinely detached from transport. It matters here
-more than usual, because most world mutations arrive from the scheduler rather than from
-a request.
-
 - **Contour 1 splits on portability, not purity.** `Timestamp` appears in the signature of
   the projection function that runs on both sides, so it is `kernel`; a connection pool is
   not portable and is `platform`.
+- **A port lives in `kernel` whenever anything outside the consumer implements it.** Not a
+  preference — the package graph forbids `platform` from importing `server`, so a port
+  placed with its consumer cannot be implemented anywhere else. ADR 0005.
 - **An engine depends on `kernel` and on nothing else in the repository.** It declares what
   it needs as a port, `platform` implements it, `server` connects them. An engine that
   needs anything more was drawn wrong.
@@ -186,7 +184,7 @@ Reasons that otherwise get rediscovered the expensive way:
   a new mechanic that would break that gets reformulated rather than the model propped up.
 - Authentication is **stubbed**, and fails closed. Every route requires a principal
   unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
-  refuses to boot. Use cases take a `Principal`, never a request or a token.
+  refuses to boot.
 
 Persistence is settled in discussion and awaiting its ADR (#13): Drizzle, READ COMMITTED
 with explicit row locks, transactions through `AsyncLocalStorage`. The detail lives in
@@ -320,9 +318,6 @@ not split yet — #42.
   every quantity is a function of elapsed time fails silently and reads as a balance bug.
 - **Never `Date.now()` in domain code.** Time comes from an injected `Clock`, and engines
   take the instant as an argument — ADR 0001, ADR 0002.
-- **Use cases take a `Principal`**, never a request, a token or a session. The same use
-  case is invoked over HTTP, from a job handler and from a script; only one of those has a
-  request to read.
 - **A package's public surface is its `index.ts`.** Reaching into another package's
   internal module is not done.
 - **Named exports only.** A default export renames itself at every import site.
