@@ -279,13 +279,15 @@ Notes that will otherwise cost time:
   the same checks plus typecheck, tests and the client build. Neither is something to
   remember — the hook runs on the host, so the compose stack does not have to be up.
 - Never push directly to `main` — always a feature branch + PR.
+- **Always branch from `main`**, never from whatever is checked out: `pnpm branch
+  issue-<number>-<short-description>`. Squash merges discard a child merged into a parent
+  afterwards, and this has already lost three pull requests. CI refuses a pull request whose
+  base is not `main`, so the mistake costs a rebase rather than the work.
 - Use git worktrees for parallel work: `git worktree add ../expansa-issue-N -b issue-N-description`
-- Branch naming: `issue-<number>-<short-description>`
 - Commit messages reference the issue: `Fixes #12` or `Refs #12`
 - PR description must link the issue it closes
-- **Stacked PRs must be merged bottom-up.** Merges here are squash merges, so merging a
-  parent first discards any child merged into it afterwards. This has already silently
-  dropped two PRs; prefer not stacking at all.
+- **Take the conflict, not the stack.** When two branches touch the same file, whichever
+  merges second rebases. That costs minutes; stacking has cost whole pull requests.
 
 ## Documentation Rules
 - **All written artifacts are in English**: ADRs, domain docs, README, code comments,
