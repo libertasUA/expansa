@@ -281,8 +281,13 @@ Notes that will otherwise cost time:
 - **All written artifacts are in English**: ADRs, domain docs, README, code comments,
   commit messages, PR descriptions, issue titles and bodies. This holds regardless of
   the language used in chat.
-- Significant architectural decisions with alternatives considered → new ADR in
-  /docs/adr/, sequentially numbered, never edited after merge (superseded by new ADR instead)
+- A decision belongs in an ADR when **both** hold: a competent person could reasonably have
+  chosen otherwise, and reversing it later would be expensive. Sequentially numbered in
+  `/docs/adr/`, never edited after merge — superseded instead, and wholly rather than in
+  part. `docs/adr/README.md` has the concept, the index, and what each section is for.
+- **Every ADR leaves one line here or in `/docs/domain/`**, with its number appended. An ADR
+  nobody is directed to has no effect on what gets built, because nothing loads it during
+  normal work — and nothing should have to.
 - Business logic changes → update the relevant /docs/domain/<feature>.md
 - Don't document trivial refactors or bug fixes — keep signal high
 
