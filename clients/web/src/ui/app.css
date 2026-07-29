@@ -256,3 +256,62 @@ button:disabled {
   font-size: 11px;
   fill: #3d4757;
 }
+
+.scene--single {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign-in {
+  width: min(22rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.sign-in label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sign-in label span {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #5c6b80;
+}
+
+.sign-in input {
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  color: #e6edf5;
+  background: rgba(5, 8, 13, 0.65);
+  border: 1px solid #263041;
+  border-radius: 4px;
+}
+
+.sign-in input:focus {
+  outline: none;
+  border-color: #3c5f7d;
+}
+
+/* A text button, so the alternative is available without competing with the
+   action the form is actually for. */
+.sign-in .link {
+  border: none;
+  background: none;
+  color: #5c6b80;
+  font-size: 0.75rem;
+  padding: 0;
+}
+
+.sign-in .link:hover {
+  color: #8fb0d0;
+  background: none;
+}
+
+.views button:last-child {
+  flex: 0 0 2.4rem;
+}

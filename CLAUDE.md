@@ -184,7 +184,8 @@ Reasons that otherwise get rediscovered the expensive way:
   a new mechanic that would break that gets reformulated rather than the model propped up.
 - Authentication is **stubbed**, and fails closed. Every route requires a principal
   unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
-  refuses to boot.
+  refuses to boot. Sign-in is a login and a password against accounts held in
+  memory; the token returned is the account id, so the guard is unchanged by it.
 
 Persistence is settled in discussion and awaiting its ADR (#13): Drizzle, READ COMMITTED
 with explicit row locks, transactions through `AsyncLocalStorage`. The detail lives in
@@ -251,10 +252,11 @@ node tools/check-contours.mjs                    # game vocabulary in an engine
 curl localhost:3000/health
 open http://localhost:5173     # the web client
 
-# Authenticated endpoints: in stub mode the bearer token IS the account id,
-# so any UUID works and no sign-in flow exists yet.
-curl -H "Authorization: Bearer 3f6b1c22-9a44-4c31-8b7e-2d5a90ff1e07" \
-     localhost:3000/v1/me
+# Sign-in is stubbed: a login and a password, and the token it returns IS the
+# account id. Any well-formed UUID still works as a bearer token.
+curl -X POST -H 'Content-Type: application/json' \
+     -d '{"login":"roma","password":"correcthorse"}' \
+     localhost:3000/v1/auth/register
 ```
 
 Notes that will otherwise cost time:

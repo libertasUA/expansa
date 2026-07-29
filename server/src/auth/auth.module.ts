@@ -1,8 +1,11 @@
 import { Logger, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
+import { ACCOUNT_REPOSITORY } from './account';
 import { AuthGuard } from './auth.guard';
 import { AUTHENTICATOR, type Authenticator } from './authenticator';
+import { CredentialsUseCase } from './credentials.use-case';
+import { InMemoryAccountRepository } from './in-memory-account.repository';
 import { StubAuthenticator } from './stub-authenticator';
 
 /**
@@ -52,7 +55,9 @@ function selectAuthenticator(): Authenticator {
     { provide: AUTHENTICATOR, useFactory: selectAuthenticator },
     // Global, so routes are protected unless they opt out with @Public().
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: ACCOUNT_REPOSITORY, useClass: InMemoryAccountRepository },
+    CredentialsUseCase,
   ],
-  exports: [AUTHENTICATOR],
+  exports: [AUTHENTICATOR, CredentialsUseCase],
 })
 export class AuthModule {}

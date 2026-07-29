@@ -1,7 +1,9 @@
 import { type JSX, useEffect, useState } from 'react';
 
+import { useSession } from '../core/session';
 import { useArk } from '../core/use-ark';
 import { ArkSilhouette, type Compartment } from './ark-silhouette';
+import { SignIn } from './sign-in';
 import { SpaceBackdrop } from './space-backdrop';
 import { SystemMap, type Body } from './system-map';
 import './app.css';
@@ -72,6 +74,23 @@ const MODULE_NAMES: Readonly<Record<string, string>> = {
 type View = 'ark' | 'system';
 
 export function App(): JSX.Element {
+  const { token, signOut } = useSession();
+
+  if (token === null) {
+    return (
+      <>
+        <SpaceBackdrop />
+        <div className="scene scene--single">
+          <SignIn />
+        </div>
+      </>
+    );
+  }
+
+  return <Game onSignOut={signOut} />;
+}
+
+function Game({ onSignOut }: { readonly onSignOut: () => void }): JSX.Element {
   const { checkpoint, pending, error, busy, synthesise } = useArk();
   const [view, setView] = useState<View>('ark');
   const [now, setNow] = useState(Date.now());
@@ -126,6 +145,9 @@ export function App(): JSX.Element {
               onClick={() => setView('system')}
             >
               System
+            </button>
+            <button type="button" onClick={onSignOut} title="Sign out">
+              ⏻
             </button>
           </nav>
 
