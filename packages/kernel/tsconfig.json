@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     // CommonJS output, consumed by the server. The ESM twin is built by
     // tsconfig.esm.json for client bundlers; see the package exports map.

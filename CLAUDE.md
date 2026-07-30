@@ -1,359 +1,80 @@
-# Expansa — MMO Strategy Game
+# Expansa MMO strategy
 
-## Overview
-MMO strategy game (Travian/Third World-like) with a sci-fi setting.
-Backend: Node.js + TypeScript.
 
-**One client ships at launch; which one is not decided.** Mobile (React Native) and web
-are both candidates, and a Steam build would be the web client in a desktop shell rather
-than a third codebase. The boundaries below are built for several clients — see Clients.
+## Three contours — architecture principle
 
-## Architecture: Three-Contour Approach
+- **Contour 1** — the tech stack (runtime, storage, protocols).
+- **Contour 2** — parameterised modules, configured via schema/policy, not branches.
+  Two kinds: domain-agnostic (auth, billing) and game-specific (production, combat).
+- **Contour 3** — the product: domain model, data, rules, module configuration.
 
-Each contour shrinks the one above it by orders of magnitude, so the product itself stays
-small enough to hold in one head. That reduction is the criterion for everything below:
-if a thing does not shrink the contour above it, it is in the wrong place.
 
-- **Contour 1 (Technology Stack)**: runtime, protocols, storage, security, observability,
-  performance, concurrency, infrastructure, stable contracts and extension points.
-  Written rarely, expensively, tested and profiled, reused across many products —
-  which is a description of PostgreSQL, Node and Fastify, not of our code.
-  **Mostly chosen, not written.**
-- **Contour 2 (Parameterized Modules)**: large capabilities that represent a *family* of
-  scenarios, reconfigured through schemas, metadata, policies and handlers — never through
-  new branches. **Half of it is bought**: authentication, payments, notifications, roles.
-  The other half we write, because nobody sells a strategy-game engine.
-- **Contour 3 (Product)**: the game — domain model, data schemas, business rules,
-  policies, module configuration, and a small number of genuinely unique handlers.
-  Mostly YAML config, minimal code.
 
-**The test**: if the code contains the words `building`, `unit`, `fleet`, `asteroid`
-or `clan`, it is Contour 3. Contour 2 knows only about "a timed transformation with a
-cost, prerequisites and effects"; that construction, research and ship production are
-all instances of it is a fact of Contour 3.
+## Stack
 
-Naming a module after a game system is the failure mode this test exists to prevent:
-a "building system" is one scenario in a folder, not an engine. The engine is a timed
-transformation; buildings are configuration.
-
-## Contour 1: chosen, not written
-
-```
-Contour 1 = adopted technology (~90%) + the seams between it (~10%)
-```
-
-Its heaviest part — PostgreSQL — is not even in `node_modules`; it is a separate process in
-a separate container. Our code belongs on the **seams**, where neither adopted piece knows
-about the other. Code here that is not on a seam is usually something that should have been
-adopted instead.
-
-Two rules that reach beyond this contour and so live here rather than in `platform/`:
-
-- **A runtime dependency is a Contour 1 decision**, carrying the same weight as choosing the
-  database — adopting badly costs as much as writing badly and is harder to see, because
-  nobody reads it. Development tooling is not covered.
-- **We married PostgreSQL and keep the query layer replaceable.** A port is how an adopted
-  technology is owned rather than owning us; it belongs where a thing is replaceable and is
-  a liability where we married.
-
-**Writing in `kernel` or `platform`: read `platform/CLAUDE.md` first.** It holds the three
-questions to ask before adding anything, what may not be abstracted, and why there is no
-`@nestjs` dependency there.
-
-## Contour 2: half bought, half written
-
-**Bought (2a).** Every horizontal capability — authentication, payments, notifications,
-roles, analytics. If something adoptable exists, writing our own is not allowed. The
-library needs no directory; everything around it does — port in `kernel`, adapter in
-`platform`, binding in `server`, configuration in `content`. ADR 0005.
-
-**Written (2b).** The family engines: projected quantities, timed transformations, modifier
-stacks, deterministic resolution, visibility. Nobody sells these.
-
-The one rule that reaches outside the package, because it constrains product work too:
-
-> **Adding a Contour 3 entity must cost zero lines of code.**
-
-A new resource, building or ship is a content entry. If it requires touching TypeScript,
-the engine did not happen.
-
-**Writing an engine: read `engines/CLAUDE.md` first.** It holds the threshold for building
-one at all, the config-versus-handler boundary, and the time invariant from ADR 0002 that
-decides what an engine may model.
-
-## Repository Layout
-
-Contours are **workspace packages, not directories** — ADR 0004. A package cannot import
-what its `package.json` does not declare, and TypeScript project references refuse the
-same import a second time, so the boundary holds without anyone remembering it.
-
-The root states the architecture:
-
-```
-kernel/        Contour 1 — descriptions: types, ports, pure functions. No dependencies.
-platform/      Contour 1 — adapters over adopted technology                  (not yet)
-engines/       Contour 2 — one package per family of scenarios               (not yet)
-contracts/     client ↔ server surface, versioned                            (not yet)
-content/       Contour 3 — data                                              (not yet)
-server/        Contour 3 — handlers, wiring, and the only composition root
-clients/       one package per client                                        (not yet)
-```
-
-```
-server  →  engines  →  kernel
-   ↓                     ↑
-platform ────────────────┘
-```
-
-Inside the server:
-
-```
-server/src/
-├── handlers/    unique effects, invoked by name from content
-├── wiring/      builds engines from content, injects platform adapters
-├── api/         controllers — transport only, zero logic
-└── jobs/        event handlers — transport only, zero logic
-```
-
-- **Contour 1 splits on portability, not purity.** `Timestamp` appears in the signature of
-  the projection function that runs on both sides, so it is `kernel`; a connection pool is
-  not portable and is `platform`.
-- **A port lives in `kernel` whenever anything outside the consumer implements it.** Not a
-  preference — the package graph forbids `platform` from importing `server`, so a port
-  placed with its consumer cannot be implemented anywhere else. ADR 0005.
-- **An engine depends on `kernel` and on nothing else in the repository.** It declares what
-  it needs as a port, `platform` implements it, `server` connects them. An engine that
-  needs anything more was drawn wrong.
-- **Storage belongs to whoever owns the state**: `accounts` to `platform`, generic tables
-  to the non-portable engine that owns them, game tables to the product. **A portable
-  engine owns no storage at all** — it also runs where there is no database.
-- **Portable packages build twice**, CommonJS for the server and ESM for a client bundler,
-  selected by the `exports` map. Declarations come from the CommonJS build only.
-- **Nothing is created before it holds something.** Packages marked *not yet* are a map,
-  not directories.
-- The build is a project-reference graph: `tsc -b` from the root, and the server's watch
-  loop rebuilds `kernel` on change. `nest build` is not used — it knows nothing about
-  references and would compile against stale declarations.
-
-## Tech Stack
-
-### Platform
-
-Married, in the sense above. Changing any row is a project-level decision, not a task.
+Married: changing any row is a project-level decision, not a task.
 
 | | Version | Pinned in |
 |---|---|---|
-| Node.js | 24 LTS, image `node:24-bookworm-slim` | `Dockerfile.dev`, `engines` |
+| Node.js | 24 LTS, `node:24-bookworm-slim` | `Dockerfile.dev` |
 | TypeScript | 5.9.3, `strict` | `tsconfig.base.json` |
-| PostgreSQL | 18, image `postgres:18-alpine` | `docker-compose.yml` |
+| PostgreSQL | 18, `postgres:18-alpine` | `docker-compose.yml` |
 | pnpm | 11.17.0 via corepack | `packageManager` |
-| Local environment | Docker Compose: Postgres + a Node container | `docker-compose.yml` |
 
-Reasons that otherwise get rediscovered the expensive way:
+NestJS 11 on the Fastify adapter — ADR 0001. Persistence is Drizzle with explicit row locks,
+settled in discussion and awaiting ADR #13. `docs/environment.md` holds the reasons behind
+the pins, and the traps.
 
-- **Debian, not Alpine**, for the Node image: glibc versus musl matters once `node_modules`
-  is bind-mounted from an Ubuntu host.
-- **The database is published on host port 5435.** 5432-5434 belong to system-installed
-  PostgreSQL clusters on this machine, and quietly talking to the wrong database is
-  expensive to diagnose. Inside the compose network it is `postgres:5432`.
-- **PostgreSQL 18 mounts `/var/lib/postgresql`**, not `/var/lib/postgresql/data` — 18+
-  expects a version subdirectory so `pg_upgrade --link` works.
-- **Images are pinned to a major version, never `latest`.**
-- **Everything runs in the container**, including the web client's Vite server; do not run
-  pnpm on the host. A mobile client would be the exception, needing USB and emulators.
-- **Vite proxies `/v1` to the server**, so the browser sees one origin and there is no CORS
-  configuration to get wrong. It also polls for file changes, because a bind mount does not
-  deliver inotify events.
-- **pnpm blocks dependency install scripts**, which is the right default. `esbuild` is
-  allowed in `pnpm-workspace.yaml` because Vite cannot start without its native binary;
-  anything else added there is a deliberate exception.
-- Server is **CommonJS** (NestJS tooling requires it); portable packages emit both
-  CommonJS and ESM so a client bundler can consume them — ADR 0004.
-- **Not TypeScript 7 yet**: `@nestjs/cli` still pins 5.9.x.
+## Running it
 
-### Decided
-
-- Runtime and framework: NestJS 11 on the Fastify adapter — ADR 0001
-- Repository layout: contours are workspace packages, rooted — ADR 0004 (supersedes 0003)
-- **The first client is web** — React on Vite, in `clients/web`. Chosen for the feedback
-  loop: no emulator, no store review, and a Steam build would be this client in a desktop
-  shell anyway. Mobile stays possible; `src/core` and `src/ui` are split from the first
-  commit so the shared half can be extracted when a second client appears.
-- Time model: quantities are computed from a checkpoint, never credited by a tick;
-  discrete events are scheduled — ADR 0002. **A rate may never depend on an amount**, and
-  a new mechanic that would break that gets reformulated rather than the model propped up.
-- Authentication is **stubbed**, and fails closed. Every route requires a principal
-  unless marked `@Public()`; `AUTH_MODE` has no default and an unset or `real` value
-  refuses to boot. Sign-in is a login and a password against accounts held in
-  memory; the token returned is the account id, so the guard is unchanged by it.
-
-Persistence is settled in discussion and awaiting its ADR (#13): Drizzle, READ COMMITTED
-with explicit row locks, transactions through `AsyncLocalStorage`. The detail lives in
-`platform/CLAUDE.md`, since nothing outside that package acts on it.
-
-### Still open
-
-Do not assume an answer; ask before writing code that depends on it.
-
-- Validation and schema approach. Partly narrowed: the schema must execute in the client
-  too, which rules out decorator-based `class-validator` DTOs as the only source
-- Job scheduler and queue — leaning toward a PostgreSQL-native queue, so that enqueueing is
-  inside the same transaction as the state change that caused it
-- Event ordering for simultaneous events on one base
-- Client-server contract details and the server-push channel
-
-### Not chosen at all
-
-Gaps, recorded so they stay visible:
-
-- **No test runner decision.** `node:test` is in use because it needs no adoption and no
-  configuration; #34 is still open, and it should be settled before the persistence layer,
-  whose lock ordering and retry behaviour is exactly the code that fails silently without
-  tests.
-- **No observability.** No structured logging, request ids, query timing or lock-wait
-  visibility. We chose explicit row locks and currently could not see contention if it
-  happened.
-- **No integration tests, and so no PostgreSQL in CI.** Nothing under test touches the
-  database yet; it arrives with the first repository test.
-
-## Clients
-
-One client will be written; the architecture assumes there will be more. Almost nothing on
-the server depends on which comes first — only push transport, payment provider and session
-storage do, and all three are adapters at the edge.
-
-Two rules belong here because the *server* has to honour them:
-
-- **The server never knows which client is talking to it.** No branching on platform.
-- **The contract is versioned (`/v1`) and changes additively.** A mobile client updates over
-  weeks, so several contract versions are served at once. `/health` is exempt.
-
-One consequence lands in the schema before any client exists and is expensive to retrofit:
-**accounts, not users** — several sign-in providers resolve to one player. The account id is
-ours and outlives a world, so a game table references who a player is *in a world*, a
-separate row, and never the account or a provider's id — ADR 0006.
-
-**Working in a client: read `clients/CLAUDE.md` first.** It holds the `core`/`ui` split,
-projecting against server time, and what the map is allowed to display.
-
-## Local Development
-
-Everything server-side runs inside the compose stack; do not run pnpm on the host.
+**Everything runs in the compose stack. Never run pnpm on the host.**
 
 ```bash
-cp .env.example .env          # first time only
-docker compose up -d          # postgres, server, web — all hot-reload
+cp .env.example .env                              # first time only
+docker compose up -d                              # postgres, server, web — all hot-reload
 docker compose logs -f server
-docker compose exec server pnpm typecheck        # every project
-docker compose exec server pnpm test             # every project that has tests
-docker compose exec server pnpm db:migrate       # apply pending migrations
-docker compose exec server pnpm lint             # ESLint, type-aware
-docker compose exec server pnpm format           # Prettier, writes
-node tools/check-contours.mjs                    # game vocabulary in an engine
-curl localhost:3000/health
-open http://localhost:5173     # the web client
-
-# Sign-in is stubbed: a login and a password, and the token it returns IS the
-# account id. Any well-formed UUID still works as a bearer token.
-curl -X POST -H 'Content-Type: application/json' \
-     -d '{"login":"roma","password":"correcthorse"}' \
-     localhost:3000/v1/auth/register
+docker compose exec server pnpm typecheck
+docker compose exec server pnpm test
+docker compose exec server pnpm lint
+docker compose exec server pnpm format
+docker compose exec server pnpm db:migrate
+curl localhost:3000/health                        # the web client is on 5173
 ```
 
-Notes that will otherwise cost time:
-- If `docker compose` cannot reach a daemon, the active context is Docker Desktop and
-  it is not running: `docker context use default`.
-- The dev loop is `tsc -b --watch` plus `node --watch`, *not* `nest start --watch` —
-  the latter can leave the old process holding the port and silently serve stale code.
-  `-b` is what makes an edit in `kernel/` reach the running server.
-- A build error in a dependency stops the server from restarting, and it is reported in
-  the `tsc` half of the compose output, not the `app` half. Check both before assuming
-  the server is serving current code.
-- **Never share a `tsbuildinfo` between an emitting build and `tsc --noEmit`**: the second
-  build sees "up to date" and emits nothing, leaving an empty `dist`. The server's
-  `typecheck` passes `--incremental false` for this reason; composite projects cannot, so
-  they use `tsc -b --force` instead.
+A build error in a dependency stops the server from restarting and is reported in the `tsc`
+half of the compose output, not the `app` half — check both before believing the server is
+running current code. Everything else that costs an hour is in `docs/environment.md`.
 
-## Workflow Rules
-- Every change starts from a GitHub issue. No issue, no work.
-- A pre-commit hook formats and lints staged files and checks contour vocabulary; CI runs
-  the same checks plus typecheck, tests and the client build. Neither is something to
-  remember — the hook runs on the host, so the compose stack does not have to be up.
-- Never push directly to `main` — always a feature branch + PR.
-- **Always branch from `main`**, never from whatever is checked out: `pnpm branch
-  issue-<number>-<short-description>`. Squash merges discard a child merged into a parent
-  afterwards, and this has already lost three pull requests. CI refuses a pull request whose
-  base is not `main`, so the mistake costs a rebase rather than the work.
-- Use git worktrees for parallel work: `git worktree add ../expansa-issue-N -b issue-N-description`
-- Commit messages reference the issue: `Fixes #12` or `Refs #12`
-- PR description must link the issue it closes
-- **Take the conflict, not the stack.** When two branches touch the same file, whichever
-  merges second rebases. That costs minutes; stacking has cost whole pull requests.
+## Working
 
-## Documentation Rules
-- **All written artifacts are in English**: ADRs, domain docs, README, code comments,
-  commit messages, PR descriptions, issue titles and bodies. This holds regardless of
-  the language used in chat.
-- A decision belongs in an ADR when **both** hold: a competent person could reasonably have
-  chosen otherwise, and reversing it later would be expensive. Sequentially numbered in
-  `/docs/adr/`, never edited after merge — superseded instead, and wholly rather than in
-  part. `docs/adr/README.md` has the concept, the index, and what each section is for.
-- **Every ADR leaves one line here or in `/docs/domain/`**, with its number appended. An ADR
-  nobody is directed to has no effect on what gets built, because nothing loads it during
-  normal work — and nothing should have to.
-- Business logic changes → update the relevant /docs/domain/<feature>.md
-- Don't document trivial refactors or bug fixes — keep signal high
+- **Every change starts from a GitHub issue.** No issue, no work.
+- **Never push to `main`.** Branch with `pnpm branch issue-<number>-<short-description>`,
+  which branches from `main` rather than from whatever is checked out.
+- **Take the conflict, not the stack.** Whoever merges second rebases, which costs minutes;
+  stacking has cost three pull requests.
+- A commit references its issue (`Fixes #12`), and a pull request links the issue it closes.
+- **All written artifacts are in English** — ADRs, docs, comments, commit messages, issue and
+  pull request bodies — whatever language the conversation is in.
+- A change to business logic updates the matching `docs/domain/` file.
+- A pre-commit hook formats, lints and checks contour vocabulary; CI runs those plus
+  typecheck, tests and the client build.
 
-### Where a rule goes
+## Conventions
 
-This file is loaded at the start of every session; a package's `CLAUDE.md` is loaded only
-when work happens there. So the split is not cosmetic — it decides what every task pays for.
+Anything checkable belongs to Prettier and ESLint — run `pnpm format` and `pnpm lint:fix`,
+and read `eslint.config.mjs` for which rules exist and why. What follows cannot be checked:
 
-| | |
-|---|---|
-| **Here** | how to place a thing, how to work, and any rule another package must honour |
-| **`<package>/CLAUDE.md`** | how to write code *in that package* |
-
-Rule of thumb: **this file states, a package elaborates.** The acceptance criterion for an
-engine is here because product work depends on it; that ids are strings rather than unions
-is in `engines/`, because only an engine author can get that wrong.
-
-The test is a count, not a judgement of importance:
-
-> **A rule goes in the narrowest file loaded wherever it can be broken.** More than one
-> package can break it → here. Exactly one → that package's file.
-
-A rule can be load-bearing and still not belong here: of the five ADR 0006 produced, only
-the one constraining game tables was this file's.
-
-> **No rule may appear in two files.** A duplicated rule is one that gets edited in one
-> place and goes stale in the other. A package file may *reference* a rule stated here — it
-> may not restate it.
-
-Existing package files: `platform/`, `engines/`, `clients/`. `kernel/` and `server/` are
-not split yet — #42.
-
-## Code Conventions
-
-Formatting and import order are Prettier's and ESLint's problem, not yours — run
-`pnpm format` and `pnpm lint:fix`. Nothing about whitespace, quotes or trailing commas is
-written down here on purpose: a rule someone has to remember is a rule that gets forgotten.
-
-
-- **Comments explain why, not what.** A comment restating the code is noise; one recording
-  why an obvious approach was rejected is why the file is still readable in six months.
-- **No `any`.** `strict` and `noUncheckedIndexedAccess` are on. An unavoidable cast is
-  narrow and carries a comment saying why it is safe.
 - **Branded types instead of bare `string` and `number`** wherever confusion is possible:
-  `AccountId`, `Timestamp`, `Duration`. Seconds mistaken for milliseconds in a game where
-  every quantity is a function of elapsed time fails silently and reads as a balance bug.
-- **Never `Date.now()` in domain code.** Time comes from an injected `Clock`, and engines
-  take the instant as an argument — ADR 0001, ADR 0002.
-- **A package's public surface is its `index.ts`.** Reaching into another package's
-  internal module is not done.
-- **Named exports only.** A default export renames itself at every import site.
-- **Files kebab-case, one exported concept each**; classes PascalCase.
-- **`readonly` on data interfaces.** Anything crossing a boundary — checkpoints, principals,
-  engine state — is immutable, and engines return new values rather than mutating arguments.
+  `AccountId`, `Timestamp`, `Duration`. Seconds mistaken for milliseconds, in a game where
+  every quantity is a function of elapsed time, fails silently and reads as a balance bug.
+- **Never `Date.now()` in domain code.** Time arrives from an injected `Clock`, and an engine
+  takes the instant as an argument — ADR 0001, ADR 0002.
+- **`readonly` on data interfaces.** Anything crossing a boundary is immutable, and engines
+  return new values rather than mutating their arguments.
 - **Errors carry meaning, not strings.** `kernel` throws built-in error types because it is
   portable and knows nothing about HTTP; the server maps them at the edge.
+- **A package's public surface is its `index.ts`**, and exports are named — a default export
+  renames itself at every import site.
+- **Comments record why**, and are worth most when they say why an obvious approach was
+  rejected.
+

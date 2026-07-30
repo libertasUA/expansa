@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 /**
- * One ordered history for the whole database, at the repository root.
+ * One ordered history for the whole database, in `apps/server-side/migrations`.
  *
  * Definitions are split by owner — `platform` declares its own tables, the
  * product declares the game's — but migrations are not, because ordering crosses

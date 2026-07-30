@@ -4,13 +4,10 @@
 # declare, which is what makes the boundary hold without anyone remembering it.
 # See ADR 0004.
 packages:
-  - kernel
-  - platform
-  - engines/*
-  - contracts
-  - content
-  - server
-  - clients/*
+  - packages/*
+  - packages/engines/*
+  - apps/server-side/*
+  - apps/clients/*
 
 # pnpm blocks dependency install scripts by default, which is the right default —
 # a package running arbitrary code at install time is how supply-chain attacks

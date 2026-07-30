@@ -84,6 +84,43 @@ The arrow runs one way. An ADR always produces a rule; most rules have no ADR be
 and a rule without a number is normal rather than a gap — it means nobody thought it worth
 arguing about.
 
+## Where a rule goes
+
+This applies to every rule, not only the ones an ADR produces, which is why it lives here
+rather than in any single `CLAUDE.md`.
+
+The root `CLAUDE.md` is loaded at the start of every session; a package's is loaded only when
+work happens there. So the split is not cosmetic — it decides what every task pays for.
+
+| | |
+|---|---|
+| **Root `CLAUDE.md`** | how to place a thing, how to work, and any rule a second package must honour |
+| **`<package>/CLAUDE.md`** | how to write code *in that package* |
+| **`docs/`** | what has to be read deliberately: environment traps, domain, these records |
+
+The test is a count, not a judgement of importance:
+
+> **A rule goes in the narrowest file loaded wherever it can be broken.** More than one
+> package can break it → the root file. Exactly one → that package's file.
+
+A rule can be load-bearing and still not belong at the root: of the five ADR 0006 produced,
+only the one constraining game tables was, and even that one is `server`'s.
+
+Two further tests, before writing a rule as prose at all:
+
+> **Does the tooling already enforce it?** Then the paragraph documents a guarantee rather
+> than creating one, and it will outlive the thing it describes. Delete it, or make the check
+> exist and delete it.
+
+> **Does the model's default already agree?** "Comments explain why, not what" needs no
+> instruction. What earns its place is a rule whose idiomatic answer is *wrong* here —
+> `useFactory` over `useClass`, ids as strings rather than unions, a rate that may not depend
+> on an amount.
+
+> **No rule may appear in two files.** A duplicated rule is one that gets edited in one place
+> and goes stale in the other. A package file may *reference* a rule stated at the root — it
+> may not restate it.
+
 ## Superseding
 
 Status moves `Proposed → Accepted → Superseded`. `Proposed` is not ceremony: ADR 0002 sat
@@ -112,7 +149,7 @@ mechanism of superseding, not an edit to it.
 | [0001](0001-server-runtime-and-framework.md) | Accepted | Node 24 LTS, CommonJS on the server, TypeScript 5.9, NestJS on the Fastify adapter |
 | [0002](0002-time-model.md) | Accepted | Quantities are computed from a checkpoint rather than ticked; events are scheduled. **A rate may never depend on an amount** — which constrains game design, not just code |
 | [0003](0003-repository-layout.md) | **Partially superseded by 0004** | Contours are workspace packages. Its dependency rules, portability split, dual CJS/ESM build and project-reference graph still stand only here |
-| [0004](0004-repository-layout-at-the-root.md) | Accepted | The layout lives at the repository root; who owns which tables; `server/src` |
+| [0004](0004-repository-layout-at-the-root.md) | **Superseded, replacement owed — #66** | Described the flat root layout, replaced by `apps/` and `packages/`. Its table-ownership rule and the shape of `server/src` still hold and have nowhere else to live yet |
 | [0005](0005-adopted-capabilities.md) | Accepted | What is adopted rather than written, and where each piece of an adopted capability lands |
 | [0006](0006-account-and-identity-model.md) | Accepted | The account id is ours and outlives a world; credentials are rows; accounts are never merged |
 

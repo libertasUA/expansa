@@ -1,6 +1,9 @@
 # ADR 0004 — Repository Layout at the Root
 
-- **Status**: Accepted
+- **Status**: **Superseded** — the repository moved to `apps/` and `packages/`. The
+  replacement record is owed, not written: see #66. Everything below describes a layout that
+  no longer exists, except the table-ownership rule and the shape of `server/src`, which the
+  new ADR has to restate before this one can be retired.
 - **Date**: 2026-07-28
 - **Supersedes**: the physical layout and package naming of ADR 0003. Its dependency
   rules, the split of Contour 1 by portability, the dual CommonJS/ESM build and the

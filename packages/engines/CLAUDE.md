@@ -81,6 +81,10 @@ No game vocabulary — `building`, `unit`, `fleet`, `asteroid`, `clan`. An engin
 "a timed transformation with a cost, prerequisites and effects"; that construction and
 research are instances of it is a fact of Contour 3.
 
+**Naming a package after a game system is the failure the rule exists to prevent.** A
+"building system" is one scenario in a folder, not an engine. The engine is the timed
+transformation; buildings are configuration.
+
 ## Storage
 
 **A portable engine owns no storage at all** — it also runs where there is no database, and

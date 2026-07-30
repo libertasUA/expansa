@@ -18,7 +18,7 @@ import { extname, join, relative } from 'node:path';
  */
 const FORBIDDEN = ['building', 'unit', 'fleet', 'asteroid', 'clan', 'village'];
 
-const ROOTS = ['engines'];
+const ROOTS = ['packages/engines'];
 
 const pattern = new RegExp(`\\b(${FORBIDDEN.join('|')})s?\\b`);
 

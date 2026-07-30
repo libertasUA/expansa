@@ -14,7 +14,7 @@ import tseslint from 'typescript-eslint';
  */
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', 'migrations/meta/**'],
+    ignores: ['**/dist/**', '**/node_modules/**', 'apps/server-side/migrations/meta/**'],
   },
 
   js.configs.recommended,
@@ -79,7 +79,10 @@ export default tseslint.config(
     // and TypeScript's project references. Transport must reach the platform
     // through a use case, or the claim that logic is detached from transport is
     // decoration.
-    files: ['server/src/api/**/*.ts', 'server/src/jobs/**/*.ts'],
+    files: [
+      'apps/server-side/nest/src/api/**/*.ts',
+      'apps/server-side/nest/src/jobs/**/*.ts',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -112,7 +115,11 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: false,
-        project: ['*/tsconfig.test.json', '*/*/tsconfig.test.json'],
+        project: [
+          'packages/*/tsconfig.test.json',
+          'packages/*/*/tsconfig.test.json',
+          'apps/*/*/tsconfig.test.json',
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },
