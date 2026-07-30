@@ -33,43 +33,47 @@ export class OrderSynthesisUseCase {
       );
     }
 
-    const ark = await this.arks.load(principal.accountId);
     const now = this.clock.now();
 
-    // Settle first, then mutate. Skipping this would price the order against a
-    // stale checkpoint, and any fuel delivered in the meantime would be credited
-    // afterwards on top of a state that had already moved past it.
-    const settled = settleSynthesis(ark, now, this.quantities);
+    // One call, not load-then-save: the repository holds a row lock across the
+    // whole of this, so two orders arriving together cannot both price against
+    // the same checkpoint and have the later write erase the earlier.
+    return this.arks.mutate(principal.accountId, (ark) => {
+      // Settle first, then mutate. Skipping this would price the order against a
+      // stale checkpoint, and any fuel delivered in the meantime would be
+      // credited afterwards on top of a state that had already moved past it.
+      const settled = settleSynthesis(ark, now, this.quantities);
 
-    const cost = { energy: fuel * SYNTHESIS.energyPerFuel };
-    let checkpoint;
-    try {
-      checkpoint = this.quantities.spend(settled.checkpoint, now, cost);
-    } catch (error) {
-      if (error instanceof InsufficientQuantityError) {
-        throw new BadRequestException(
-          `Not enough ${error.quantityId}: have ${Math.floor(error.available)}, ` +
-            `need ${error.required}`,
-        );
+      const cost = { energy: fuel * SYNTHESIS.energyPerFuel };
+      let checkpoint;
+      try {
+        checkpoint = this.quantities.spend(settled.checkpoint, now, cost);
+      } catch (error) {
+        if (error instanceof InsufficientQuantityError) {
+          // Thrown from inside the transaction, which rolls it back — an order
+          // that could not be paid for leaves the ark exactly as it was.
+          throw new BadRequestException(
+            `Not enough ${error.quantityId}: have ${Math.floor(error.available)}, ` +
+              `need ${error.required}`,
+          );
+        }
+        throw error;
       }
-      throw error;
-    }
 
-    const next: Ark = {
-      ...settled,
-      checkpoint,
-      pending: [
-        ...settled.pending,
-        {
-          id: randomUUID(),
-          fuel,
-          orderedAt: now,
-          completesAt: addDuration(now, seconds(fuel * SYNTHESIS.secondsPerFuel)),
-        },
-      ],
-    };
-
-    await this.arks.save(next);
-    return next;
+      const next: Ark = {
+        ...settled,
+        checkpoint,
+        pending: [
+          ...settled.pending,
+          {
+            id: randomUUID(),
+            fuel,
+            orderedAt: now,
+            completesAt: addDuration(now, seconds(fuel * SYNTHESIS.secondsPerFuel)),
+          },
+        ],
+      };
+      return next;
+    });
   }
 }

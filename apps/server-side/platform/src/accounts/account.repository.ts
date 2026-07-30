@@ -19,6 +19,15 @@ export interface AccountIdentity {
 export interface AccountRepository {
   findByIdentity(provider: string, externalId: string): Promise<AccountIdentity | null>;
   createWithIdentity(identity: AccountIdentity): Promise<void>;
+
+  /**
+   * Whether this id names an account at all.
+   *
+   * Needed because game rows carry a foreign key to `accounts`, so an id that
+   * passes for one and is not one turns into a constraint violation several
+   * layers down rather than a refusal at the edge.
+   */
+  exists(accountId: string): Promise<boolean>;
 }
 
 /**
@@ -46,6 +55,16 @@ export class DrizzleAccountRepository implements AccountRepository {
       .limit(1);
 
     return row ?? null;
+  }
+
+  async exists(accountId: string): Promise<boolean> {
+    const [row] = await this.db
+      .select({ id: accounts.id })
+      .from(accounts)
+      .where(eq(accounts.id, accountId))
+      .limit(1);
+
+    return row !== undefined;
   }
 
   /**

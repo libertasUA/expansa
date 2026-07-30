@@ -11,7 +11,10 @@ import { defineConfig } from 'drizzle-kit';
  */
 export default defineConfig({
   dialect: 'postgresql',
-  schema: ['./apps/server-side/platform/src/**/schema.ts'],
+  schema: [
+    './apps/server-side/platform/src/**/schema.ts',
+    './apps/server-side/nest/src/**/schema.ts',
+  ],
   out: './apps/server-side/migrations',
   migrations: { schema: 'drizzle' },
   dbCredentials: { url: process.env.DATABASE_URL ?? '' },
