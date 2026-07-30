@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     // CommonJS, not ESM. The NestJS CLI, its watch mode, and decorator metadata
     // emission are all built around CJS; ESM support exists but is fragile enough
@@ -15,7 +15,14 @@
     "baseUrl": "./",
     "rootDir": "./src"
   },
-  "references": [{ "path": "../kernel" }, { "path": "../engines/quantity" }],
+  "references": [
+    { "path": "../../../packages/kernel" },
+    { "path": "../../../packages/engines/quantity" },
+    // Added with the move: the server imports @expansa/platform, so its watch
+    // build has to rebuild it. Without this an edit in platform compiled only
+    // when something else happened to run `tsc -b` from the root.
+    { "path": "../platform" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

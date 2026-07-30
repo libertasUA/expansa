@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     // CommonJS only. This package is server-bound by definition — it holds the
     // pool and the adapters — so there is nothing for a client bundler to want.
@@ -16,5 +16,5 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../kernel" }]
+  "references": [{ "path": "../../../packages/kernel" }]
 }

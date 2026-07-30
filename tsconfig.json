@@ -8,9 +8,9 @@
   // dependency to package.json by hand.
   "files": [],
   "references": [
-    { "path": "./kernel" },
-    { "path": "./platform" },
-    { "path": "./engines/quantity" },
-    { "path": "./server" }
+    { "path": "./packages/kernel" },
+    { "path": "./packages/engines/quantity" },
+    { "path": "./apps/server-side/platform" },
+    { "path": "./apps/server-side/nest" }
   ]
 }

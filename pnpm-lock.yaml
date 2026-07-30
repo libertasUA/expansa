@@ -42,14 +42,14 @@ importers:
         specifier: ^8.65.0
         version: 8.65.0(eslint@10.8.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
 
-  clients/web:
+  apps/clients/web:
     dependencies:
       '@expansa/engine-quantity':
         specifier: workspace:*
-        version: link:../../engines/quantity
+        version: link:../../../packages/engines/quantity
       '@expansa/kernel':
         specifier: workspace:*
-        version: link:../../kernel
+        version: link:../../../packages/kernel
       react:
         specifier: ^19.2.0
         version: 19.2.8
@@ -73,58 +73,14 @@ importers:
         specifier: ^7.2.0
         version: 7.3.6(@types/node@24.13.3)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
 
-  engines/quantity:
-    dependencies:
-      '@expansa/kernel':
-        specifier: workspace:*
-        version: link:../../kernel
-    devDependencies:
-      '@types/node':
-        specifier: ^24.13.3
-        version: 24.13.3
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
-  kernel:
-    devDependencies:
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
-  platform:
-    dependencies:
-      '@expansa/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      drizzle-orm:
-        specifier: ^0.44.7
-        version: 0.44.7(@types/pg@8.20.0)(pg@8.22.0)
-      pg:
-        specifier: ^8.16.3
-        version: 8.22.0
-    devDependencies:
-      '@types/node':
-        specifier: ^24.13.3
-        version: 24.13.3
-      '@types/pg':
-        specifier: ^8.15.6
-        version: 8.20.0
-      drizzle-kit:
-        specifier: ^0.31.6
-        version: 0.31.10
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
-  server:
+  apps/server-side/nest:
     dependencies:
       '@expansa/engine-quantity':
         specifier: workspace:*
-        version: link:../engines/quantity
+        version: link:../../../packages/engines/quantity
       '@expansa/kernel':
         specifier: workspace:*
-        version: link:../kernel
+        version: link:../../../packages/kernel
       '@expansa/platform':
         specifier: workspace:*
         version: link:../platform
@@ -159,6 +115,50 @@ importers:
       concurrently:
         specifier: ^10.0.4
         version: 10.0.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  apps/server-side/platform:
+    dependencies:
+      '@expansa/kernel':
+        specifier: workspace:*
+        version: link:../../../packages/kernel
+      drizzle-orm:
+        specifier: ^0.44.7
+        version: 0.44.7(@types/pg@8.20.0)(pg@8.22.0)
+      pg:
+        specifier: ^8.16.3
+        version: 8.22.0
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
+      '@types/pg':
+        specifier: ^8.15.6
+        version: 8.20.0
+      drizzle-kit:
+        specifier: ^0.31.6
+        version: 0.31.10
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/engines/quantity:
+    dependencies:
+      '@expansa/kernel':
+        specifier: workspace:*
+        version: link:../../kernel
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/kernel:
+    devDependencies:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -4321,9 +4321,9 @@ snapshots:
     dependencies:
       reusify: 1.1.0
 
-  fdir@6.5.0(picomatch@4.0.4):
+  fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   file-entry-cache@8.0.0:
     dependencies:
@@ -4946,8 +4946,8 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
+      fdir: 6.5.0(picomatch@4.0.5)
+      picomatch: 4.0.5
 
   toad-cache@3.7.4: {}
 
@@ -5026,8 +5026,8 @@ snapshots:
   vite@7.3.6(@types/node@24.13.3)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0):
     dependencies:
       esbuild: 0.28.1
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
+      fdir: 6.5.0(picomatch@4.0.5)
+      picomatch: 4.0.5
       postcss: 8.5.23
       rollup: 4.62.3
       tinyglobby: 0.2.17

@@ -3,9 +3,44 @@
 The only package that sees all three contours. The root `CLAUDE.md` is already loaded;
 this adds only what applies to writing code here.
 
+```
+server/src/
+├── handlers/    unique effects, invoked by name from content
+├── wiring/      builds engines from content, injects platform adapters
+├── api/         controllers — transport only, zero logic
+└── jobs/        event handlers — transport only, zero logic
+```
+
 **Not yet settled: where use cases live.** ADR 0004 named `handlers`, `wiring`, `api` and
 `jobs` and said nothing about the operations a player initiates, which is why `ark/`
 currently sits beside `auth/` — an accident rather than a decision. See #42.
+
+## What the server owes every client
+
+There will be more than one client, and the server is where that is honoured or lost:
+
+- **The server never knows which client is talking to it.** No branching on platform, and no
+  reading a User-Agent to guess. A client that needs different behaviour asks for it.
+- **The contract is versioned and additive.** Fields may be added to `/v1`; removing one or
+  changing its meaning needs a new version, because a mobile client updates over weeks and
+  several versions are served at once. `/health` is exempt — it is infrastructure read by
+  Docker, not a contract anyone pins to.
+
+## Game tables reference the player, not the account
+
+The account id is `platform`'s and outlives a world — ADR 0006. A game table therefore
+references **who a player is in a world**, a separate round-scoped row, and never the
+account directly. Anything round-scoped that attaches to the account has to be migrated the
+first time a second world opens.
+
+## Every route requires a principal
+
+The global guard denies by default; `@Public()` is the opt-out and there are two of them,
+both under `v1/auth`. A route that needs no principal says so — a guard that has to be
+remembered per controller is one that gets forgotten on the controller that mattered.
+
+Authentication is currently stubbed. `docs/environment.md` has what that means while
+developing.
 
 ## Catch up before you mutate
 

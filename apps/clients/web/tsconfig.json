@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     // ESM and bundler resolution: Vite consumes the ESM half of the portable
     // packages through their exports map, which is what that second build exists
