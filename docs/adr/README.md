@@ -75,6 +75,11 @@ need it; whoever wants to argue opens the number.
 > **Every ADR must leave a line in `CLAUDE.md` or `docs/domain/`, or it has no effect on
 > what gets built.**
 
+**In the narrowest one.** `CLAUDE.md` above means whichever of them is loaded where the rule
+can be broken — a package's file counts, and is usually the right answer. Read as "the root
+file", this sentence turns every ADR into a tax on every session: 0006 produced five rules
+of which one was the root file's, and all five went there first.
+
 The arrow runs one way. An ADR always produces a rule; most rules have no ADR behind them,
 and a rule without a number is normal rather than a gap — it means nobody thought it worth
 arguing about.
@@ -109,6 +114,7 @@ mechanism of superseding, not an edit to it.
 | [0003](0003-repository-layout.md) | **Partially superseded by 0004** | Contours are workspace packages. Its dependency rules, portability split, dual CJS/ESM build and project-reference graph still stand only here |
 | [0004](0004-repository-layout-at-the-root.md) | Accepted | The layout lives at the repository root; who owns which tables; `server/src` |
 | [0005](0005-adopted-capabilities.md) | Accepted | What is adopted rather than written, and where each piece of an adopted capability lands |
+| [0006](0006-account-and-identity-model.md) | Accepted | The account id is ours and outlives a world; credentials are rows; accounts are never merged |
 
 ## Decisions that meet the bar and have no ADR
 

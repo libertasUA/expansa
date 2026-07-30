@@ -229,8 +229,9 @@ Two rules belong here because the *server* has to honour them:
   weeks, so several contract versions are served at once. `/health` is exempt.
 
 One consequence lands in the schema before any client exists and is expensive to retrofit:
-**accounts, not users.** `accounts` plus `identities(provider, external_id)`, because one
-player may arrive through Apple, Google, Steam or email and must be one account.
+**accounts, not users** — several sign-in providers resolve to one player. The account id is
+ours and outlives a world, so a game table references who a player is *in a world*, a
+separate row, and never the account or a provider's id — ADR 0006.
 
 **Working in a client: read `clients/CLAUDE.md` first.** It holds the `core`/`ui` split,
 projecting against server time, and what the map is allowed to display.
@@ -316,6 +317,14 @@ when work happens there. So the split is not cosmetic — it decides what every 
 Rule of thumb: **this file states, a package elaborates.** The acceptance criterion for an
 engine is here because product work depends on it; that ids are strings rather than unions
 is in `engines/`, because only an engine author can get that wrong.
+
+The test is a count, not a judgement of importance:
+
+> **A rule goes in the narrowest file loaded wherever it can be broken.** More than one
+> package can break it → here. Exactly one → that package's file.
+
+A rule can be load-bearing and still not belong here: of the five ADR 0006 produced, only
+the one constraining game tables was this file's.
 
 > **No rule may appear in two files.** A duplicated rule is one that gets edited in one
 > place and goes stale in the other. A package file may *reference* a rule stated here — it

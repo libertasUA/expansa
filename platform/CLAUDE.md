@@ -95,6 +95,23 @@ Generate with `pnpm db:generate`, apply with `pnpm db:migrate`. Drizzle's own bo
 lives in a `drizzle` schema so that `public` stays empty and nothing lands there by
 accident.
 
+## Accounts — ADR 0006
+
+The root file states only that the account id is ours and outlives a world. The rest is here
+because only this package can get it wrong.
+
+- **The display name is an account column**, never derived from an identity. An Apple
+  subject claim is opaque and Google and Steam supply nothing meant to be read, so no
+  provider can be the source of a human-readable name. It is globally unique and is not the
+  login.
+- **A password identity's `external_id` is an email address**, not a handle. A handle leaves
+  no recovery channel, and a forgotten password is then a permanently lost account.
+- **Accounts are never merged.** An account gains and loses identities, always from inside
+  an already-authenticated session. Two accounts never become one — the obstacle is the game
+  state, not these tables.
+- **Deletion anonymises**: the account row survives as a tombstone, its display name and its
+  identities do not, and game history keeps its foreign keys.
+
 ## Settled, awaiting ADR (#13)
 
 Treat as decided; the reasoning is not written down yet.
