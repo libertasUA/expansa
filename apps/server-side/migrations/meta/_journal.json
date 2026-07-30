@@ -15,6 +15,13 @@
       "when": 1785345088247,
       "tag": "0001_accounts_and_identities",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785428547730,
+      "tag": "0002_game_worlds_players_holdings",
+      "breakpoints": true
     }
   ]
 }

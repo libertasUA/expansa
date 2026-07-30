@@ -1,7 +1,11 @@
 import { Logger, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
-import { DrizzleAccountRepository, type Database } from '@expansa/platform';
+import {
+  type AccountRepository,
+  DrizzleAccountRepository,
+  type Database,
+} from '@expansa/platform';
 
 import { DATABASE, DatabaseModule } from '../wiring/database.module';
 import { ACCOUNT_REPOSITORY } from './account-repository.token';
@@ -20,7 +24,7 @@ import { StubAuthenticator } from './stub-authenticator';
  * that forgets the variable fails loudly at startup instead of accepting any
  * account id from anyone.
  */
-function selectAuthenticator(): Authenticator {
+function selectAuthenticator(accounts: AccountRepository): Authenticator {
   const mode = process.env.AUTH_MODE;
 
   if (mode === 'stub') {
@@ -31,10 +35,10 @@ function selectAuthenticator(): Authenticator {
       );
     }
     new Logger('Auth').warn(
-      'Authentication is STUBBED: the bearer token is taken as the account id, ' +
-        'unverified. Development only.',
+      'Authentication is STUBBED: the bearer token is taken as the account id and ' +
+        'checked only for existence, never proved. Development only.',
     );
-    return new StubAuthenticator();
+    return new StubAuthenticator(accounts);
   }
 
   if (mode === 'real') {
@@ -55,14 +59,18 @@ function selectAuthenticator(): Authenticator {
 @Module({
   imports: [DatabaseModule],
   providers: [
-    { provide: AUTHENTICATOR, useFactory: selectAuthenticator },
-    // Global, so routes are protected unless they opt out with @Public().
-    { provide: APP_GUARD, useClass: AuthGuard },
     {
       provide: ACCOUNT_REPOSITORY,
       inject: [DATABASE],
       useFactory: (db: Database) => new DrizzleAccountRepository(db),
     },
+    {
+      provide: AUTHENTICATOR,
+      inject: [ACCOUNT_REPOSITORY],
+      useFactory: selectAuthenticator,
+    },
+    // Global, so routes are protected unless they opt out with @Public().
+    { provide: APP_GUARD, useClass: AuthGuard },
     CredentialsUseCase,
   ],
   exports: [AUTHENTICATOR, CredentialsUseCase],

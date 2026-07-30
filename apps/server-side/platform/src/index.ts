@@ -7,6 +7,13 @@
 export { MIGRATIONS_FOLDER, MIGRATIONS_SCHEMA } from './database/migrations-config';
 export { createDatabase, type Database } from './database/connection';
 
+// The table itself, not just its repository: a game table carries a foreign key
+// to `platform.accounts`, and a foreign key cannot be declared against a name.
+// Exporting it is narrower than it looks — the product may reference an account,
+// which it already had to, and still cannot reach past this package for anything
+// else.
+export { accounts, identities } from './accounts/schema';
+
 export {
   type AccountIdentity,
   type AccountRepository,

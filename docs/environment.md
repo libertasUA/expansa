@@ -55,8 +55,10 @@ what makes an edit in `packages/kernel/` reach the running server.
 `AUTH_MODE` has **no default**. Unset refuses to boot, and so does `real`, which is not
 implemented. `stub` refuses to boot when `NODE_ENV=production`.
 
-In `stub` mode the token returned by sign-in **is** the account id, so any well-formed UUID
-works as a bearer token:
+In `stub` mode the token returned by sign-in **is** the account id. It is not proved, but it
+is checked for existence — an id that names no account is refused, because game rows carry a
+foreign key to `accounts` and a mistyped header would otherwise surface several layers down
+as a constraint violation. So register first and use what it hands back:
 
 ```bash
 curl -X POST -H 'Content-Type: application/json' \
