@@ -232,6 +232,11 @@ One consequence lands in the schema before any client exists and is expensive to
 **accounts, not users.** `accounts` plus `identities(provider, external_id)`, because one
 player may arrive through Apple, Google, Steam or email and must be one account.
 
+**The account id is ours and world-independent** — game tables reference it and never a
+provider's user id; an account is never merged with another; a password identity's
+`external_id` is an email; and who a player is *in a world* is a separate row, so nothing
+round-scoped attaches to the account — ADR 0006.
+
 **Working in a client: read `clients/CLAUDE.md` first.** It holds the `core`/`ui` split,
 projecting against server time, and what the map is allowed to display.
 

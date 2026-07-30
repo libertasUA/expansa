@@ -109,6 +109,7 @@ mechanism of superseding, not an edit to it.
 | [0003](0003-repository-layout.md) | **Partially superseded by 0004** | Contours are workspace packages. Its dependency rules, portability split, dual CJS/ESM build and project-reference graph still stand only here |
 | [0004](0004-repository-layout-at-the-root.md) | Accepted | The layout lives at the repository root; who owns which tables; `server/src` |
 | [0005](0005-adopted-capabilities.md) | Accepted | What is adopted rather than written, and where each piece of an adopted capability lands |
+| [0006](0006-account-and-identity-model.md) | Accepted | The account id is ours and outlives a world; credentials are rows; accounts are never merged |
 
 ## Decisions that meet the bar and have no ADR
 
