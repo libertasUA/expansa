@@ -10,6 +10,12 @@
 
 
 
+## Layout
+
+`apps/` holds the applications, `packages/` what is shared — and **shared means imported by
+more than one application**. A library with a single consumer stays beside it rather than in
+`packages/`, which is why `platform` sits under `apps/server-side` — ADR 0007.
+
 ## Stack
 
 Married: changing any row is a project-level decision, not a task.

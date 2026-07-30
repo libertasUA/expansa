@@ -149,9 +149,10 @@ mechanism of superseding, not an edit to it.
 | [0001](0001-server-runtime-and-framework.md) | Accepted | Node 24 LTS, CommonJS on the server, TypeScript 5.9, NestJS on the Fastify adapter |
 | [0002](0002-time-model.md) | Accepted | Quantities are computed from a checkpoint rather than ticked; events are scheduled. **A rate may never depend on an amount** — which constrains game design, not just code |
 | [0003](0003-repository-layout.md) | **Partially superseded by 0004** | Contours are workspace packages. Its dependency rules, portability split, dual CJS/ESM build and project-reference graph still stand only here |
-| [0004](0004-repository-layout-at-the-root.md) | **Superseded, replacement owed — #66** | Described the flat root layout, replaced by `apps/` and `packages/`. Its table-ownership rule and the shape of `server/src` still hold and have nowhere else to live yet |
+| [0004](0004-repository-layout-at-the-root.md) | **Superseded by 0007** | Described the flat root layout. Nothing in it applies; 0007 restates the parts that survived |
 | [0005](0005-adopted-capabilities.md) | Accepted | What is adopted rather than written, and where each piece of an adopted capability lands |
 | [0006](0006-account-and-identity-model.md) | Accepted | The account id is ours and outlives a world; credentials are rows; accounts are never merged |
+| [0007](0007-apps-and-packages.md) | Accepted | `apps/` and `packages/`, split by **how many applications import a thing** rather than by what is deployed. Supersedes 0004 |
 
 ## Decisions that meet the bar and have no ADR
 
