@@ -8,6 +8,13 @@
       "when": 1785338784614,
       "tag": "0000_create_platform_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785345088247,
+      "tag": "0001_accounts_and_identities",
+      "breakpoints": true
     }
   ]
 }

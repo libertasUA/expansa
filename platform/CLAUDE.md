@@ -4,8 +4,9 @@ Adapters over adopted technology, and the machinery those adapters share. The ro
 `CLAUDE.md` is already loaded; this file adds only what applies to writing code *here*
 and is not repeated there.
 
-So far it holds the migration runner and the `platform` schema declaration. The rest —
-pool, transactions, adapters — arrives with #13.
+So far it holds the migration runner, the `platform` schema and its accounts. Transaction
+propagation, lock ordering and deadlock retry arrive with #13; nothing yet writes more than
+one row at a time.
 
 ## The contour is chosen, not written
 
@@ -78,9 +79,14 @@ in `server`, not here; a repository touching `platform.*` tables belongs here.
 
 ## Storage
 
-Two PostgreSQL schemas. This package declares and owns `platform.*` only —
-`accounts`, `identities`, `entitlements`, `receipts`, `push_tokens`. Game tables are
-declared in `server` — #13.
+Two PostgreSQL schemas. This package declares and owns `platform.*` only — `accounts` and
+`identities` today, with `entitlements`, `receipts` and `push_tokens` to come. Game tables
+are declared in `server` — #13.
+
+**An account carries no credentials.** A login and password is an identity with
+`provider = 'password'`; Apple is `provider = 'apple'` with the subject claim and no secret.
+One person reached through four providers stays one account, and adding a provider is an
+insert rather than a migration.
 
 Migrations are a single ordered history in `/migrations`, because ordering crosses schemas
 and there is one database. Definitions are split by owner; migrations are not.

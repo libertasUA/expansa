@@ -5,3 +5,10 @@
 // a value through `useFactory`, never as a class Nest instantiates. See ADR 0005.
 
 export { MIGRATIONS_FOLDER, MIGRATIONS_SCHEMA } from './database/migrations-config';
+export { createDatabase, type Database } from './database/connection';
+
+export {
+  type AccountIdentity,
+  type AccountRepository,
+  DrizzleAccountRepository,
+} from './accounts/account.repository';
