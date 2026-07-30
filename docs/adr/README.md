@@ -75,6 +75,11 @@ need it; whoever wants to argue opens the number.
 > **Every ADR must leave a line in `CLAUDE.md` or `docs/domain/`, or it has no effect on
 > what gets built.**
 
+**In the narrowest one.** `CLAUDE.md` above means whichever of them is loaded where the rule
+can be broken — a package's file counts, and is usually the right answer. Read as "the root
+file", this sentence turns every ADR into a tax on every session: 0006 produced five rules
+of which one was the root file's, and all five went there first.
+
 The arrow runs one way. An ADR always produces a rule; most rules have no ADR behind them,
 and a rule without a number is normal rather than a gap — it means nobody thought it worth
 arguing about.
