@@ -8,13 +8,25 @@
   Two kinds: domain-agnostic (auth, billing) and game-specific (production, combat).
 - **Contour 3** — the product: domain model, data, rules, module configuration.
 
+## Repository layout
 
+```
+apps/
+  server-side/
+    nest/         the server (Contour 3): API, use cases, composition root
+    platform/     adapters over adopted technology (Contour 1): DB access, jobs
+    migrations/   one ordered history for the whole database
+  clients/
+    web/          web client
+packages/
+  kernel/         types, ports, pure functions — no dependencies, runs anywhere
+  engines/        game-mechanic engines (Contour 2), shared by server and clients
+  content/        game data/schemas (Contour 3), zero TypeScript logic
+```
 
-## Layout
-
-`apps/` holds the applications, `packages/` what is shared — and **shared means imported by
-more than one application**. A library with a single consumer stays beside it rather than in
-`packages/`, which is why `platform` sits under `apps/server-side` — ADR 0007.
+**Shared means imported by more than one application.** A library with a single consumer
+stays beside it rather than moving to `packages/` — which is why `platform`, despite being a
+library, sits under `apps/server-side` — ADR 0007.
 
 ## Stack
 
