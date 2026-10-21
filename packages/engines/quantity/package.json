@@ -24,7 +24,7 @@
     "@expansa/kernel": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "@types/node": "^24.13.3"
+    "typescript": "catalog:",
+    "@types/node": "catalog:"
   }
 }

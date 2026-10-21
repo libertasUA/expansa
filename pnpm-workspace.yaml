@@ -9,6 +9,18 @@ packages:
   - apps/server-side/*
   - apps/clients/*
 
+# Versions declared by more than one package, stated once. A package refers to
+# them as `catalog:`, so two packages cannot ask for different versions of the
+# same thing — before this, six `^5.9.3` agreed only because the lockfile
+# happened to resolve them identically, and an update in one could split them.
+#
+# TypeScript is exact rather than a range: it is a row of the married stack in
+# CLAUDE.md, and @nestjs/cli still pins 5.9.x (docs/environment.md).
+catalog:
+  typescript: 5.9.3
+  '@types/node': ^24.13.3
+  drizzle-kit: ^0.31.6
+
 # pnpm blocks dependency install scripts by default, which is the right default —
 # a package running arbitrary code at install time is how supply-chain attacks
 # land, and pnpm makes each exception explicit rather than silent.
