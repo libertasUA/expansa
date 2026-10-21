@@ -23,7 +23,7 @@ Married: changing any row is a project-level decision, not a task.
 | | Version | Pinned in |
 |---|---|---|
 | Node.js | 24 LTS, `node:24-bookworm-slim` | `Dockerfile.dev` |
-| TypeScript | 5.9.3, `strict` | `tsconfig.base.json` |
+| TypeScript | 5.9.3, `strict` | `catalog` in `pnpm-workspace.yaml`; `strict` in `tsconfig.base.json` |
 | PostgreSQL | 18, `postgres:18-alpine` | `docker-compose.yml` |
 | pnpm | 11.17.0 via corepack | `packageManager` |
 
